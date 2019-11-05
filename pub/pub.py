@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 """ Define the world """
 import math
 import random
+import sys
 from astar import AStar
 
 from customer import Customer
@@ -21,25 +23,39 @@ class Pub(AStar):
         self.staff = []
         self.supplies = []
         self.customers = []
+        self.time = 0
 
     ##########################################################################
     def populate(self):
         """ Populate the pub """
         for i in range(self.num_customers):
             x, y = self.free_location()
-            cust = Customer(name=f"Customer_{i}", x=x, y=y)
+            cust = Customer(pub=self, name=f"Customer_{i}", x=x, y=y)
             self.data[(x, y)] = cust
             self.customers.append(cust)
         for i in range(self.num_supplies):
             x, y = self.free_location()
-            supply = Supply(name=f"Supply_{i}", x=x, y=y)
+            supply = Supply(pub=self, name=f"Supply_{i}", x=x, y=y)
             self.data[(x, y)] = supply
             self.supplies.append(supply)
         for i in range(self.num_staff):
             x, y = self.free_location()
-            serv = Staff(name=f"Staff_{i}", x=x, y=y)
+            serv = Staff(pub=self, name=f"Staff_{i}", x=x, y=y)
             self.data[(x, y)] = serv
             self.staff.append(serv)
+
+    ##########################################################################
+    def turn(self):
+        """ Time passing """
+        for cust in self.customers:
+            cust.turn(self.time)
+        for supply in self.supplies:
+            supply.turn(self.time)
+        for stff in self.staff:
+            rc = stff.turn(self.time)
+            if not rc:
+                sys.exit(0)
+        self.time += 1
 
     ##########################################################################
     def free_location(self):
@@ -58,7 +74,7 @@ class Pub(AStar):
         return route
 
     ##########################################################################
-    def heuristic_cost_estimate(self, n1, n2):
+    def heuristic_cost_estimate(self, n1, n2):  # pylint: disable=arguments-differ
         """computes the 'direct' distance between two (x,y) tuples"""
         (x1, y1) = n1
         (x2, y2) = n2
@@ -100,9 +116,24 @@ class Pub(AStar):
         return ans
 
     ##########################################################################
-    def draw(self, zroute=[]):
+    def move(self, obj, newloc):
+        """ Move an object to a new location """
+        del self.data[(obj.x, obj.y)]
+        self.data[(newloc[0], newloc[1])] = obj
+
+    ##########################################################################
+    def mainloop(self):
+        """ Run forever """
+        while True:
+            self.turn()
+            print(self.draw())
+
+    ##########################################################################
+    def draw(self, zroute=None):
         """ Return a string representation of the pub """
         result = ''
+        if zroute is None:
+            zroute = []
         route_path = list(zroute)
         for y in range(self.size_y):
             for x in range(self.size_x):
@@ -112,6 +143,17 @@ class Pub(AStar):
                     result += '*'
                 else:
                     result += '.'
+            if y < len(self.customers):
+                result += f"  {self.customers[y].name} {self.customers[y].demands['amount']}"
+
+            index = y - len(self.customers)
+            if index >= 0 and index < len(self.staff):
+                result += f"  {self.staff[index].name} {self.staff[index].supplies}"
+
+            index = y - len(self.customers) - len(self.staff)
+            if index >= 0 and index < len(self.supplies):
+                result += f"  {self.supplies[index].name} {self.supplies[index].amount}"
+
             result += '\n'
         return result
 
@@ -120,6 +162,7 @@ class Pub(AStar):
 if __name__ == "__main__":
     tavern = Pub()
     tavern.populate()
+    tavern.mainloop()
     myroute = tavern.find_route(tavern.staff[0], tavern.customers[0])
     print(tavern.draw(myroute))
 
