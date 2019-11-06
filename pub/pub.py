@@ -49,7 +49,11 @@ class Pub(AStar):
         """ Time passing """
         print(f"Time={self.time}")
         for cust in self.customers:
-            cust.turn(self.time)
+            rc = cust.turn(self.time)
+            if not rc:
+                print(f"Customer {cust} has left the pub")
+                del self.data[(cust.x, cust.y)]
+                self.customers.remove(cust)
         for supply in self.supplies:
             supply.turn(self.time)
         for stff in self.staff:
