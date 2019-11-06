@@ -16,6 +16,8 @@ class Staff(Person):
         """ Time passing """
         if self.target is None:
             self.target = self.pick_target(tick)
+            if self.target is None:
+                return False
             print(f"Going to {self.target.name}")
         route = list(self.pub.find_route(self, self.target))
         if len(route) <= 1:
@@ -45,7 +47,16 @@ class Staff(Person):
     def pick_target(self, tick):
         """ Pick where to go next """
         if not self.supplies:
-            target = self.pub.supplies[0]
+            min_dist = 99999
+            target = None
+            for i in self.pub.supplies:
+                if not i.amount:
+                    continue
+                path = self.pub.find_route(self, i)
+                distance = len(list(path))
+                if min_dist > distance:
+                    min_dist = distance
+                    target = i
         else:
             max_demand = 0
             max_cust = None

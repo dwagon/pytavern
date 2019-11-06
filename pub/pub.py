@@ -18,7 +18,7 @@ class Pub(AStar):
         self.size_y = size_y
         self.data = {}
         self.num_customers = 5
-        self.num_supplies = 1
+        self.num_supplies = 2
         self.num_staff = 1
         self.staff = []
         self.supplies = []
@@ -47,6 +47,7 @@ class Pub(AStar):
     ##########################################################################
     def turn(self):
         """ Time passing """
+        print(f"Time={self.time}")
         for cust in self.customers:
             cust.turn(self.time)
         for supply in self.supplies:
