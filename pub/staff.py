@@ -62,7 +62,7 @@ class Staff(Person):
             max_cust = None
             for cust in self.pub.customers:
                 dem = (tick - cust.demands['time']) * cust.demands['amount']
-                print(f"{cust.name} has {dem}")
+                print(f"{cust.name} has demand {dem}")
                 if dem > max_demand:
                     max_demand = dem
                     max_cust = cust

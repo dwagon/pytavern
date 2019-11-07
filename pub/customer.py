@@ -18,18 +18,28 @@ class Customer(Person):
     ##########################################################################
     def turn(self, tick):
         """ Time passing """
+        # Thirsty
         if not self.demands.get('amount', 0):
             self.generate_demand(tick)
             self.satisfaction -= 1
+        # Satisfied
         if not self.satisfaction:
             self.target = Coord(0, 0)
             print(f"{self} had enough")
+        else:
+            # Move away from the door
+            if self.pos == Coord(0, 0):
+                self.target = self.pub.free_location()
         if self.target:
             route = list(self.pub.find_route(self.pos, self.target))
             if len(route) <= 1:
-                return False
-            self.pub.move(self, route[1])
-            self.pos = route[1]
+                if self.target == Coord(0, 0):
+                    return False
+                else:
+                    self.target = None
+            else:
+                self.pub.move(self, route[1])
+                self.pos = route[1]
         return True
 
     ##########################################################################

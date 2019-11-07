@@ -18,6 +18,7 @@ class Pub(AStar):
         self.size_x = size_x
         self.size_y = size_y
         self.data = {}
+        self.customer_num = 0
         self.num_customers = 5
         self.num_supplies = 2
         self.num_staff = 1
@@ -29,11 +30,7 @@ class Pub(AStar):
     ##########################################################################
     def populate(self):
         """ Populate the pub """
-        for i in range(self.num_customers):
-            pos = self.free_location()
-            cust = Customer(pub=self, name=f"Customer_{i}", pos=pos)
-            self.data[pos] = cust
-            self.customers.append(cust)
+        self.new_customer()
         for i in range(self.num_supplies):
             pos = self.free_location()
             supply = Supply(pub=self, name=f"Supply_{i}", pos=pos)
@@ -46,9 +43,23 @@ class Pub(AStar):
             self.staff.append(serv)
 
     ##########################################################################
+    def new_customer(self):
+        """ Create a new customer """
+        pos = Coord(0, 0)
+        if pos in self.data:
+            return
+        cust = Customer(pub=self, name=f"Customer_{self.customer_num}", pos=pos)
+        self.data[pos] = cust
+        self.customers.append(cust)
+        self.customer_num += 1
+
+    ##########################################################################
     def turn(self):
         """ Time passing """
         print(f"Time={self.time}")
+        odds = 10 - len(self.customers)
+        if random.randrange(1, 100) < odds:
+            self.new_customer()
         for cust in self.customers:
             rc = cust.turn(self.time)
             if not rc:
@@ -163,11 +174,15 @@ class Pub(AStar):
                 else:
                     result += '.'
             if y < len(self.customers):
-                result += f"  {self.customers[y].name} {self.customers[y].demands['amount']}"
+                cust = self.customers[y]
+                result += f"  {cust.name}@{cust.pos} {cust.demands['amount']}"
+                if cust.target:
+                    result += f" -> {cust.target}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):
-                result += f"  {self.staff[index].name} {self.staff[index].supplies}"
+                stf = self.staff[index]
+                result += f"  {stf.name}@{stf.pos} {stf.supplies}"
 
             index = y - len(self.customers) - len(self.staff)
             if index >= 0 and index < len(self.supplies):
