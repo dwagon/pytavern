@@ -8,6 +8,7 @@ from astar import AStar
 from customer import Customer
 from staff import Staff
 from supply import Supply
+from coord import Coord, OutOfBoundsError
 
 
 ##############################################################################
@@ -29,19 +30,19 @@ class Pub(AStar):
     def populate(self):
         """ Populate the pub """
         for i in range(self.num_customers):
-            x, y = self.free_location()
-            cust = Customer(pub=self, name=f"Customer_{i}", x=x, y=y)
-            self.data[(x, y)] = cust
+            pos = self.free_location()
+            cust = Customer(pub=self, name=f"Customer_{i}", pos=pos)
+            self.data[pos] = cust
             self.customers.append(cust)
         for i in range(self.num_supplies):
-            x, y = self.free_location()
-            supply = Supply(pub=self, name=f"Supply_{i}", x=x, y=y)
-            self.data[(x, y)] = supply
+            pos = self.free_location()
+            supply = Supply(pub=self, name=f"Supply_{i}", pos=pos)
+            self.data[pos] = supply
             self.supplies.append(supply)
         for i in range(self.num_staff):
-            x, y = self.free_location()
-            serv = Staff(pub=self, name=f"Staff_{i}", x=x, y=y)
-            self.data[(x, y)] = serv
+            pos = self.free_location()
+            serv = Staff(pub=self, name=f"Staff_{i}", pos=pos)
+            self.data[pos] = serv
             self.staff.append(serv)
 
     ##########################################################################
@@ -52,7 +53,7 @@ class Pub(AStar):
             rc = cust.turn(self.time)
             if not rc:
                 print(f"Customer {cust} has left the pub")
-                del self.data[(cust.x, cust.y)]
+                del self.data[cust.pos]
                 self.customers.remove(cust)
         for supply in self.supplies:
             supply.turn(self.time)
@@ -69,20 +70,29 @@ class Pub(AStar):
         while not found:
             x = random.randrange(0, self.size_x)
             y = random.randrange(0, self.size_y)
-            if (x, y) not in self.data:
-                return (x, y)
+            pos = Coord(x, y)
+            if pos not in self.data:
+                return pos
 
     ##########################################################################
     def find_route(self, src, dest):
         """ Find a route between two points """
-        route = self.astar((src.x, src.y), (dest.x, dest.y))
+        if hasattr(src, 'pos'):
+            srcpos = src.pos
+        else:
+            srcpos = src
+        if hasattr(dest, 'pos'):
+            destpos = dest.pos
+        else:
+            destpos = dest
+        route = self.astar(srcpos, destpos)
         return route
 
     ##########################################################################
     def heuristic_cost_estimate(self, n1, n2):  # pylint: disable=arguments-differ
         """computes the 'direct' distance between two (x,y) tuples"""
-        (x1, y1) = n1
-        (x2, y2) = n2
+        (x1, y1) = n1.x, n1.y
+        (x2, y2) = n2.x, n2.y
         hce = math.hypot(x2 - x1, y2 - y1)
         return hce
 
@@ -94,10 +104,14 @@ class Pub(AStar):
     ##########################################################################
     def is_goal_reached(self, current, goal):
         """ Succeed if we are adjacent to the goal """
-        nx = current[0]
-        ny = current[1]
-        for tmpgoal in ((nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)):
-            if goal[0] == tmpgoal[0] and goal[1] == tmpgoal[1]:
+        nx = current.x
+        ny = current.y
+        for tmpx, tmpy in [(nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)]:
+            try:
+                tmpgoal = Coord(tmpx, tmpy, self.size_x, self.size_y)
+            except OutOfBoundsError:
+                continue
+            if goal == tmpgoal:
                 return True
         return False
 
@@ -107,24 +121,23 @@ class Pub(AStar):
         (north, east, south, west) nodes that can be reached
         (=any adjacent coordinate that is not a wall)
         """
-        nx, ny = node
+        nx, ny = node.x, node.y
         ans = []
-        for nb in ((nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)):
-            x, y = nb
-            if (x, y) in self.data:
+        for nbx, nby in ((nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)):
+            try:
+                pos = Coord(nbx, nby, self.size_x, self.size_y)
+            except OutOfBoundsError:
                 continue
-            if x < 0 or y < 0:
+            if pos in self.data:
                 continue
-            if x > self.size_x or y > self.size_y:
-                continue
-            ans.append((x, y))
+            ans.append(pos)
         return ans
 
     ##########################################################################
     def move(self, obj, newloc):
         """ Move an object to a new location """
-        del self.data[(obj.x, obj.y)]
-        self.data[(newloc[0], newloc[1])] = obj
+        del self.data[obj.pos]
+        self.data[newloc] = obj
 
     ##########################################################################
     def mainloop(self):
@@ -142,9 +155,10 @@ class Pub(AStar):
         route_path = list(zroute)
         for y in range(self.size_y):
             for x in range(self.size_x):
-                if (x, y) in self.data:
-                    result += self.data[(x, y)].repr
-                elif (x, y) in route_path:
+                pos = Coord(x, y)
+                if pos in self.data:
+                    result += self.data[pos].repr
+                elif pos in route_path:
                     result += '*'
                 else:
                     result += '.'

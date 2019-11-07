@@ -5,8 +5,8 @@ from thing import Thing
 ##############################################################################
 class Supply(Thing):
     """ Definition of supply """
-    def __init__(self, pub, name, x, y):
-        super().__init__(pub, name, x, y)
+    def __init__(self, pub, name, pos):
+        super().__init__(pub, name, pos)
         self.amount = 99
         self.repr = 'S'
 

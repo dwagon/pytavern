@@ -5,8 +5,8 @@ from person import Person
 ##############################################################################
 class Staff(Person):
     """ Staff member - satisfies customer requirements """
-    def __init__(self, pub, name, x, y):
-        super().__init__(pub, name, x, y)
+    def __init__(self, pub, name, pos):
+        super().__init__(pub, name, pos)
         self.supplies = 0
         self.repr = 'B'
         self.target = None
@@ -24,7 +24,7 @@ class Staff(Person):
             return self.serve()
         else:
             self.pub.move(self, route[1])
-            self.x, self.y = route[1]
+            self.pos = route[1]
         return True
 
     ##########################################################################

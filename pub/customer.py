@@ -8,8 +8,8 @@ from person import Person
 ##############################################################################
 class Customer(Person):
     """ Customer - resource consumer """
-    def __init__(self, pub, name, x, y):
-        super().__init__(pub, name, x, y)
+    def __init__(self, pub, name, pos):
+        super().__init__(pub, name, pos)
         self.demands = {}
         self.satisfaction = 9
         self.target = None
@@ -25,11 +25,11 @@ class Customer(Person):
             self.target = Coord(0, 0)
             print(f"{self} had enough")
         if self.target:
-            route = list(self.pub.find_route(self, self.target))
+            route = list(self.pub.find_route(self.pos, self.target))
             if len(route) <= 1:
                 return False
             self.pub.move(self, route[1])
-            self.x, self.y = route[1]
+            self.pos = route[1]
         return True
 
     ##########################################################################
