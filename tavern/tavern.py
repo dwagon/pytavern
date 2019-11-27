@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Define the world """
+
 import math
 import random
 import sys
@@ -201,12 +202,5 @@ class Tavern(AStar):
 
             result += '\n'
         return result
-
-
-##############################################################################
-if __name__ == "__main__":
-    tavern = Tavern()
-    tavern.populate()
-    tavern.mainloop()
 
 # EOF
