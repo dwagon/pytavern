@@ -8,6 +8,7 @@ class Thing:
         self.tavern = tavern
         self.name = name
         self.pos = pos
+        self.category = 'undef'
 
     ##########################################################################
     def __repr__(self):

@@ -9,5 +9,6 @@ class Stool(Thing):
         super().__init__(tavern, name, pos)
         self.repr = '#'
         self.occupied = False
+        self.category = 'furniture'
 
 # EOF

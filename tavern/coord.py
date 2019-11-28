@@ -9,7 +9,7 @@ class OutOfBoundsError(Exception):
 class Coord:
     """ Coordinate system class """
     def __init__(self, x, y, maxx=999, maxy=999):
-        if x < 0 or y < 0 or x > maxy or y > maxy:
+        if x < 0 or y < 0 or x >= maxy or y >= maxy:
             raise OutOfBoundsError
         self.x = x
         self.y = y
@@ -20,7 +20,7 @@ class Coord:
     def __hash__(self):
         return (self.x, self.y).__hash__()
 
-    def __str__(self):
-        return f"{self.x}, {self.y}"
+    def __repr__(self):
+        return f"({self.x}, {self.y})"
 
 # EOF

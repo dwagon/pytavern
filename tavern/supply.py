@@ -9,6 +9,7 @@ class Supply(Thing):
         super().__init__(tavern, name, pos)
         self.amount = 99
         self.repr = 'S'
+        self.category = 'installation'
 
     ##########################################################################
     def take(self, desired_amount):

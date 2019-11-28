@@ -8,6 +8,7 @@ class Person(Thing):
     def __init__(self, tavern, name, pos):
         super().__init__(tavern, name, pos)
         self.target = None
+        self.category = 'person'
 
     ##########################################################################
     def move(self, pick_target=None, got_there=None):

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """ Define the world """
 
 import math
@@ -10,6 +9,7 @@ from .customer import Customer
 from .staff import Staff
 from .stool import Stool
 from .supply import Supply
+from .location import Location
 from .coord import Coord, OutOfBoundsError
 
 
@@ -19,7 +19,7 @@ class Tavern(AStar):
     def __init__(self, size_x=20, size_y=20):
         self.size_x = size_x
         self.size_y = size_y
-        self.data = {}
+        self.locations = {}
         self.customer_num = 0
         self.num_customers = 5
         self.num_supplies = 2
@@ -30,35 +30,38 @@ class Tavern(AStar):
         self.stools = []
         self.customers = []
         self.time = 0
+        for x in range(self.size_x):
+            for y in range(self.size_y):
+                self.locations[Coord(x, y)] = Location()
 
     ##########################################################################
     def populate(self):
         """ Populate the tavern """
         self.new_customer()
         for i in range(self.num_supplies):
-            pos = self.free_location()
+            pos = self.free_location('installation')
             supply = Supply(tavern=self, name=f"Supply_{i}", pos=pos)
-            self.data[pos] = supply
+            self.locations[pos].add(supply)
             self.supplies.append(supply)
         for i in range(self.num_staff):
-            pos = self.free_location()
+            pos = self.free_location('person')
             serv = Staff(tavern=self, name=f"Staff_{i}", pos=pos)
-            self.data[pos] = serv
+            self.locations[pos].add(serv)
             self.staff.append(serv)
         for i in range(self.num_stools):
-            pos = self.free_location()
+            pos = self.free_location('furniture')
             stol = Stool(tavern=self, name=f"Stool_{i}", pos=pos)
-            self.data[pos] = stol
+            self.locations[pos].add(stol)
             self.stools.append(stol)
 
     ##########################################################################
     def new_customer(self):
         """ Create a new customer """
-        pos = Coord(0, 0)
-        if pos in self.data:
+        doorpos = Coord(0, 0)
+        if not self.locations[doorpos].isempty('person'):
             return
-        cust = Customer(tavern=self, name=f"Customer_{self.customer_num}", pos=pos)
-        self.data[pos] = cust
+        cust = Customer(tavern=self, name=f"Customer_{self.customer_num}", pos=doorpos)
+        self.locations[doorpos].add(cust)
         self.customers.append(cust)
         self.customer_num += 1
         print(f"{cust} has arrived")
@@ -74,7 +77,7 @@ class Tavern(AStar):
             rc = cust.turn()
             if not rc:
                 print(f"Customer {cust} has left the tavern")
-                del self.data[cust.pos]
+                del self.locations[cust.pos]
                 self.customers.remove(cust)
         for supply in self.supplies:
             supply.turn()
@@ -85,14 +88,14 @@ class Tavern(AStar):
             sys.exit(0)
 
     ##########################################################################
-    def free_location(self):
+    def free_location(self, category):
         """ Find a free location in the tavern """
         found = False
         while not found:
             x = random.randrange(0, self.size_x)
             y = random.randrange(0, self.size_y)
             pos = Coord(x, y)
-            if pos not in self.data:
+            if self.locations[pos].isempty(category):
                 return pos
 
     ##########################################################################
@@ -149,7 +152,7 @@ class Tavern(AStar):
                 pos = Coord(nbx, nby, self.size_x, self.size_y)
             except OutOfBoundsError:
                 continue
-            if pos in self.data:
+            if not self.locations[pos].isempty():
                 continue
             ans.append(pos)
         return ans
@@ -157,8 +160,8 @@ class Tavern(AStar):
     ##########################################################################
     def move(self, obj, newloc):
         """ Move an object to a new location """
-        del self.data[obj.pos]
-        self.data[newloc] = obj
+        self.locations[obj.pos].delete(obj.category)
+        self.locations[newloc].add(obj)
 
     ##########################################################################
     def mainloop(self):
@@ -177,8 +180,8 @@ class Tavern(AStar):
         for y in range(self.size_y):
             for x in range(self.size_x):
                 pos = Coord(x, y)
-                if pos in self.data:
-                    result += self.data[pos].repr
+                if pos in self.locations:
+                    result += self.locations[pos].repr()
                 elif pos in route_path:
                     result += '*'
                 else:
