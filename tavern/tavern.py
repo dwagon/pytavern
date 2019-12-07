@@ -74,10 +74,10 @@ class Tavern(AStar):
         if random.randrange(1, 100) < odds:
             self.new_customer()
         for cust in self.customers:
-            rc = cust.turn()
-            if not rc:
+            cust.turn()
+            if cust.finish():
                 print(f"Customer {cust} has left the tavern")
-                del self.locations[cust.pos]
+                self.locations[cust.pos].delete('person')
                 self.customers.remove(cust)
         for supply in self.supplies:
             supply.turn()
@@ -187,12 +187,7 @@ class Tavern(AStar):
                 else:
                     result += '.'
             if y < len(self.customers):
-                cust = self.customers[y]
-                result += f"  {cust.name}@{cust.pos}"
-                if cust.target:
-                    result += f" -> {cust.target}"
-                if cust.demands['amount']:
-                    result += f" Demands: {cust.demands['amount']}"
+                result += self.customers[y].description()
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):

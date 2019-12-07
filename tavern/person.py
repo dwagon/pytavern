@@ -11,13 +11,12 @@ class Person(Thing):
         self.category = 'person'
 
     ##########################################################################
-    def move(self, pick_target=None, got_there=None):
+    def move(self, pick_target, got_there):
         """ Move Person """
         # Decide where to go
-        if self.target is None and pick_target:
-            self.target = pick_target()
-            if self.target is None:
-                return False
+        self.target = pick_target()
+        if self.target is None:
+            return False
         # Go there
         route = list(self.tavern.find_route(self.pos, self.target))
         if len(route) <= 1:
