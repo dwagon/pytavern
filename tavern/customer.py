@@ -20,18 +20,12 @@ class Customer(Person):
         self.repr = 'C'
         self.mode = GO_STOOL
         self.target_stool = None
-
-    ##########################################################################
-    def finish(self):
-        """ Has this customer finished? """
-        if self.mode == GO_HOME and self.pos == Coord(0, 0):
-            return True
-        return False
+        self.terminate = False
 
     ##########################################################################
     def turn(self):
         """ Time passing """
-        return self.move(self.pick_target, self.sit)
+        return self.move(self.pick_target, self.got_there)
 
     ##########################################################################
     def description(self):
@@ -45,28 +39,31 @@ class Customer(Person):
             d += f" Demands: {self.demands['amount']}"
         if self.satisfaction:
             d += f" Drink to go: {self.satisfaction}"
+        d += f" {self.mode}"
         return d
 
     ##########################################################################
-    def sit(self):
-        """ Sit down at the stool """
-        if self.mode != GO_STOOL:
-            return True
-        if not self.target_stool.occupied:
-            self.mode = DRINK
-            self.tavern.move(self, self.target_stool.pos)
-            self.target_stool.occupied = True
-            self.generate_demand()
-            print(f"{self} sat on {self.target_stool}")
-        else:
-            target = self.pick_stool()
-            self.target_stool = target
+    def got_there(self):
+        """ Got to where we want to go """
+        if self.mode == GO_STOOL:
+            if not self.target_stool.occupied:
+                self.mode = DRINK
+                self.tavern.move(self, self.target_stool.pos)
+                self.target_stool.occupied = True
+                self.generate_demand()
+                print(f"{self} sat on {self.target_stool}")
+            else:
+                target = self.pick_stool()
+                self.target_stool = target
+        elif self.mode == GO_HOME:
+            self.terminate = True
         return True
 
     ##########################################################################
     def pick_stool(self):
         """ Pick a stool to aim for """
         random.shuffle(self.tavern.stools)
+        target = None
         for stl in self.tavern.stools:
             if not stl.occupied:
                 target = stl
@@ -79,17 +76,23 @@ class Customer(Person):
         target = None
         # Still Thirsty
         if self.mode == DRINK:
-            target = self.pos
+            return None
         # Satisfied
-        if self.mode == GO_HOME:
+        elif self.mode == GO_HOME:
             target = Coord(0, 0)
         # Just arrived
-        if self.mode == GO_STOOL:
+        elif self.mode == GO_STOOL:
             if self.target_stool is None:
                 target = self.pick_stool()
                 self.target_stool = target
+                if target is None:
+                    print("All stools are occupied")
+                    self.target = self.tavern.free_location('person')
+                print(target)
             else:
                 target = self.target_stool
+        else:
+            print(f"Unknown mode {self.mode}")
         return target
 
     ##########################################################################

@@ -16,15 +16,15 @@ from .coord import Coord, OutOfBoundsError
 ##############################################################################
 class Tavern(AStar):
     """ World Class definition """
-    def __init__(self, size_x=20, size_y=20):
-        self.size_x = size_x
-        self.size_y = size_y
+    def __init__(self, **kwargs):
+        self.size_x = kwargs.get('size_x', 20)
+        self.size_y = kwargs.get('size_y', 20)
         self.locations = {}
         self.customer_num = 0
-        self.num_customers = 5
-        self.num_supplies = 2
-        self.num_staff = 1
-        self.num_stools = 10
+        self.num_supplies = kwargs.get('num_supplies', 2)
+        self.num_staff = kwargs.get('num_staff', 1)
+        self.num_stools = kwargs.get('num_stools', 10)
+        self.max_customers = kwargs.get('max_customers', 10)
         self.staff = []
         self.supplies = []
         self.stools = []
@@ -60,6 +60,8 @@ class Tavern(AStar):
         doorpos = Coord(0, 0)
         if not self.locations[doorpos].isempty('person'):
             return
+        if len(self.customers) >= self.max_customers:
+            return
         cust = Customer(tavern=self, name=f"Customer_{self.customer_num}", pos=doorpos)
         self.locations[doorpos].add(cust)
         self.customers.append(cust)
@@ -75,7 +77,7 @@ class Tavern(AStar):
             self.new_customer()
         for cust in self.customers:
             cust.turn()
-            if cust.finish():
+            if cust.terminate:
                 print(f"Customer {cust} has left the tavern")
                 self.locations[cust.pos].delete('person')
                 self.customers.remove(cust)
