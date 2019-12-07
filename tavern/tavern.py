@@ -147,14 +147,19 @@ class Tavern(AStar):
         """
         nx, ny = node.x, node.y
         ans = []
-        for nbx, nby in ((nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)):
-            try:
-                pos = Coord(nbx, nby, self.size_x, self.size_y)
-            except OutOfBoundsError:
-                continue
-            if not self.locations[pos].isempty():
-                continue
-            ans.append(pos)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                if dx == 0 and dy == 0:
+                    continue
+                nbx = nx + dx
+                nby = ny + dy
+                try:
+                    pos = Coord(nbx, nby, self.size_x, self.size_y)
+                except OutOfBoundsError:
+                    continue
+                if not self.locations[pos].isempty():
+                    continue
+                ans.append(pos)
         return ans
 
     ##########################################################################
