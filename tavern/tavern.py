@@ -8,6 +8,7 @@ from astar import AStar
 from .customer import Customer
 from .staff import Staff
 from .stool import Stool
+from .wall import Wall
 from .supply import Supply
 from .location import Location
 from .coord import Coord, OutOfBoundsError
@@ -37,6 +38,7 @@ class Tavern(AStar):
     ##########################################################################
     def populate(self):
         """ Populate the tavern """
+        self.draw_walls()
         self.new_customer()
         for i in range(self.num_supplies):
             pos = self.free_location('installation')
@@ -53,6 +55,15 @@ class Tavern(AStar):
             stol = Stool(tavern=self, name=f"Stool_{i}", pos=pos)
             self.locations[pos].add(stol)
             self.stools.append(stol)
+
+    ##########################################################################
+    def draw_walls(self):
+        """ Draw the walls around the place """
+        for x in range(self.size_x):
+            for y in range(self.size_y):
+                if x == 0 or y == 0 or x == self.size_x - 1 or y == self.size_y - 1:
+                    pos = Coord(x, y)
+                    self.locations[pos].add(Wall(self, "Wall", pos))
 
     ##########################################################################
     def new_customer(self):

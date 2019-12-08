@@ -4,7 +4,7 @@
 ##############################################################################
 class Location:
     """ Class definition of a location """
-    categories = ['undef', 'installation', 'furniture', 'person']
+    categories = ['undef', 'structure', 'installation', 'furniture', 'person']
 
     def __init__(self):
         self.data = {}
@@ -15,6 +15,8 @@ class Location:
 
     def isempty(self, category='undef'):
         """ Return True if the location is empty """
+        if self.data.get('structure'):
+            return False
         return self.data.get(category) is None
 
     def delete(self, category='undef'):
