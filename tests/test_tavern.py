@@ -17,14 +17,22 @@ class Test_Tavern(unittest.TestCase):
 
 
 ##############################################################################
-class Test_Populate(unittest.TestCase):
+class Test_Stool(unittest.TestCase):
     """ Test populate """
-    def test_stools(self):
+    def setUp(self):
+        self.tvn = tavern.Tavern(size_x=11, size_y=12, num_stools=1)
+        self.tvn.populate()
+
+    def test_populate(self):
         """ test stools creation """
-        tvn = tavern.Tavern(size_x=11, size_y=12, num_stools=1)
-        tvn.populate()
-        self.assertEqual(tvn.size_x, 11)
-        self.assertEqual(tvn.size_y, 12)
-        self.assertEqual(len(tvn.stools), 1)
+        self.assertEqual(self.tvn.size_x, 11)
+        self.assertEqual(self.tvn.size_y, 12)
+        self.assertEqual(len(self.tvn.stools), 1)
+
+    def test_locations(self):
+        """ Test stool locations """
+        stool = self.tvn.stools[0]
+        loc = self.tvn.locations[stool.pos]
+        self.assertEqual(loc.data['furniture'], stool)
 
 # EOF
