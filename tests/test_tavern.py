@@ -22,6 +22,7 @@ class Test_Populate(unittest.TestCase):
     def test_stools(self):
         """ test stools creation """
         tvn = tavern.Tavern(size_x=11, size_y=12, num_stools=1)
+        tvn.populate()
         self.assertEqual(tvn.size_x, 11)
         self.assertEqual(tvn.size_y, 12)
         self.assertEqual(len(tvn.stools), 1)
