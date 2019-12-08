@@ -169,6 +169,7 @@ class Tavern(AStar):
         """ Move an object to a new location """
         self.locations[obj.pos].delete(obj.category)
         self.locations[newloc].add(obj)
+        obj.pos = newloc
 
     ##########################################################################
     def mainloop(self):
