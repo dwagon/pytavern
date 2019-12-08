@@ -35,4 +35,21 @@ class Test_Stool(unittest.TestCase):
         loc = self.tvn.locations[stool.pos]
         self.assertEqual(loc.data['furniture'], stool)
 
+
+##############################################################################
+class Test_Path(unittest.TestCase):
+    """ Test path and movement """
+    def setUp(self):
+        self.tvn = tavern.Tavern(size_x=10, size_y=10, num_stools=1, max_customers=1, num_staff=0)
+        self.tvn.populate()
+
+    def test_path(self):
+        """ Test that a customer gets to the stool """
+        for _ in range(20):
+            self.tvn.turn()
+        cust = self.tvn.customers[0]
+        stool = self.tvn.stools[0]
+        self.assertEqual(cust.pos, stool.pos)
+
+
 # EOF
