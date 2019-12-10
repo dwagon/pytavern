@@ -9,6 +9,7 @@ from .customer import Customer
 from .staff import Staff
 from .stool import Stool
 from .wall import Wall
+from .door import Door
 from .supply import Supply
 from .location import Location
 from .coord import Coord, OutOfBoundsError
@@ -30,6 +31,7 @@ class Tavern(AStar):
         self.supplies = []
         self.stools = []
         self.customers = []
+        self.door = Coord(0, 1)
         self.time = 0
         for x in range(self.size_x):
             for y in range(self.size_y):
@@ -61,20 +63,21 @@ class Tavern(AStar):
         """ Draw the walls around the place """
         for x in range(self.size_x):
             for y in range(self.size_y):
-                if x == 0 or y == 0 or x == self.size_x - 1 or y == self.size_y - 1:
-                    pos = Coord(x, y)
+                pos = Coord(x, y)
+                if pos == self.door:
+                    self.locations[pos].add(Door(self, "Door", pos))
+                elif x == 0 or y == 0 or x == self.size_x - 1 or y == self.size_y - 1:
                     self.locations[pos].add(Wall(self, "Wall", pos))
 
     ##########################################################################
     def new_customer(self):
         """ Create a new customer """
-        doorpos = Coord(0, 0)
-        if not self.locations[doorpos].isempty('person'):
+        if not self.locations[self.door].isempty('person'):
             return
         if len(self.customers) >= self.max_customers:
             return
-        cust = Customer(tavern=self, name=f"Customer_{self.customer_num}", pos=doorpos)
-        self.locations[doorpos].add(cust)
+        cust = Customer(tavern=self, name=f"Customer_{self.customer_num}", pos=self.door)
+        self.locations[self.door].add(cust)
         self.customers.append(cust)
         self.customer_num += 1
         print(f"{cust} has arrived")

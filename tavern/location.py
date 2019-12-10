@@ -15,8 +15,10 @@ class Location:
 
     def isempty(self, category='undef'):
         """ Return True if the location is empty """
-        if self.data.get('structure'):
-            return False
+        for cat in self.categories:
+            if self.data.get(cat):
+                if not self.data[cat].permeable:
+                    return False
         return self.data.get(category) is None
 
     def delete(self, category='undef'):

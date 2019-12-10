@@ -9,6 +9,7 @@ class Thing:
         self.name = name
         self.pos = pos
         self.category = 'undef'
+        self.permeable = False
 
     ##########################################################################
     def __repr__(self):

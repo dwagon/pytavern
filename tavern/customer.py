@@ -1,7 +1,6 @@
 """ Customer """
 import random
 
-from .coord import Coord
 from .person import Person
 
 GO_STOOL = 1
@@ -79,7 +78,7 @@ class Customer(Person):
             return None
         # Satisfied
         elif self.mode == GO_HOME:
-            target = Coord(0, 0)
+            target = self.tavern.door
         # Just arrived
         elif self.mode == GO_STOOL:
             if self.target_stool is None:
@@ -88,7 +87,6 @@ class Customer(Person):
                 if target is None:
                     print("All stools are occupied")
                     self.target = self.tavern.free_location('person')
-                print(target)
             else:
                 target = self.target_stool
         else:

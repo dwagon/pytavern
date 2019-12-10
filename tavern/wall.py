@@ -8,6 +8,7 @@ class Wall(Thing):
     def __init__(self, tavern, name, pos):
         super().__init__(tavern, name, pos)
         self.category = 'structure'
+        self.permeable = False
 
     @property
     def repr(self):
