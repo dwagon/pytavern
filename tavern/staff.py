@@ -23,11 +23,11 @@ class Staff(Person):
             self.supplies += take
             if take == 0:
                 return False
-            print(f"Took {take} supplies from {self.target.name}")
+            print(f"{self.name} took {take} supplies from {self.target.name}")
         if hasattr(self.target, 'receive'):
             receive = self.target.receive(self.supplies)
             self.supplies -= receive
-            print(f"Gave {receive} supplies to {self.target.name}")
+            print(f"{self.name} gave {receive} supplies to {self.target.name}")
         self.target = None
         return True
 
