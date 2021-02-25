@@ -8,6 +8,7 @@ from astar import AStar
 from customer import Customer
 from staff import Staff
 from wall import Wall
+from furniture import Table
 from supply import Supply
 from coord import Coord, OutOfBoundsError
 
@@ -23,6 +24,7 @@ class Pub(AStar):
         self.num_customers = 5
         self.num_supplies = 2
         self.num_staff = 1
+        self.num_tables = 3
         self.staff = []
         self.supplies = []
         self.customers = []
@@ -32,6 +34,7 @@ class Pub(AStar):
     def populate(self):
         """ Populate the pub """
         self.add_walls()
+        self.add_tables()
         self.new_customer()
         for i in range(self.num_supplies):
             pos = self.free_location()
@@ -43,6 +46,31 @@ class Pub(AStar):
             serv = Staff(pub=self, name=f"Staff_{i}", pos=pos)
             self.data[pos] = serv
             self.staff.append(serv)
+
+    ##########################################################################
+    def add_tables(self):
+        """ Add in a number of tables """
+        for tbl in range(self.num_tables):
+            placed = False
+            while not placed:
+                poslist = self.find_space_for_table()
+                if not poslist:
+                    continue
+                for pos in poslist:
+                    self.data[pos] = Table(self, f"Table {tbl}", pos)
+                    placed = True
+
+    ##########################################################################
+    def find_space_for_table(self):
+        """ Tables are 2x2 - find a free location """
+        pos = self.free_location()
+        poslist = []
+        for bit in ((0, 0), (0, 1), (1, 1), (1, 0)):
+            newpos = Coord(pos.x + bit[0], pos.y + bit[1])
+            if newpos in self.data:
+                return None
+            poslist.append(newpos)
+        return poslist
 
     ##########################################################################
     def add_walls(self):
