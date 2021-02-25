@@ -7,6 +7,7 @@ from astar import AStar
 
 from customer import Customer
 from staff import Staff
+from wall import Wall
 from supply import Supply
 from coord import Coord, OutOfBoundsError
 
@@ -14,7 +15,7 @@ from coord import Coord, OutOfBoundsError
 ##############################################################################
 class Pub(AStar):
     """ World Class definition """
-    def __init__(self, size_x=20, size_y=20):
+    def __init__(self, size_x=40, size_y=15):
         self.size_x = size_x
         self.size_y = size_y
         self.data = {}
@@ -30,6 +31,7 @@ class Pub(AStar):
     ##########################################################################
     def populate(self):
         """ Populate the pub """
+        self.add_walls()
         self.new_customer()
         for i in range(self.num_supplies):
             pos = self.free_location()
@@ -43,9 +45,24 @@ class Pub(AStar):
             self.staff.append(serv)
 
     ##########################################################################
+    def add_walls(self):
+        """ Add in the walls around the perimeter """
+        for x in range(self.size_x):
+            pos = Coord(x, 0)
+            self.data[pos] = Wall(self, pos)
+            pos = Coord(x, self.size_y-1)
+            self.data[pos] = Wall(self, pos)
+
+        for y in range(self.size_y):
+            pos = Coord(0, y)
+            self.data[pos] = Wall(self, pos)
+            pos = Coord(self.size_x-1, y)
+            self.data[pos] = Wall(self, pos)
+
+    ##########################################################################
     def new_customer(self):
         """ Create a new customer """
-        pos = Coord(0, 0)
+        pos = Coord(1, 1)
         if pos in self.data:
             return
         cust = Customer(pub=self, name=f"Customer_{self.customer_num}", pos=pos)
@@ -77,17 +94,21 @@ class Pub(AStar):
     ##########################################################################
     def free_location(self):
         """ Find a free location in the pub """
-        found = False
-        while not found:
+        tries = 0
+        while tries < 100:
+            tries += 1
             x = random.randrange(0, self.size_x)
             y = random.randrange(0, self.size_y)
             pos = Coord(x, y)
             if pos not in self.data:
                 return pos
+        print(f"Couldn't find a free location in {tries} attempts")
+        sys.exit(1)
 
     ##########################################################################
     def find_route(self, src, dest):
         """ Find a route between two points """
+        # print(f"find_route({src=},{dest=})")
         if hasattr(src, 'pos'):
             srcpos = src.pos
         else:
@@ -97,6 +118,7 @@ class Pub(AStar):
         else:
             destpos = dest
         route = self.astar(srcpos, destpos)
+        # print(f"find_route({src=},{dest=}) {route=}")
         return route
 
     ##########################################################################
@@ -109,7 +131,7 @@ class Pub(AStar):
 
     ##########################################################################
     def distance_between(self, n1, n2):
-        """this method always returns 1, as two 'neighbors' are always adajcent"""
+        """ This method always returns 1, as two 'neighbors' are always adjacent """
         return 1
 
     ##########################################################################
@@ -142,6 +164,7 @@ class Pub(AStar):
             if pos in self.data:
                 continue
             ans.append(pos)
+        # print(f"neighbours({node=}) {ans=}")
         return ans
 
     ##########################################################################
