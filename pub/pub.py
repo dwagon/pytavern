@@ -8,7 +8,7 @@ from astar import AStar
 from customer import Customer
 from staff import Staff
 from wall import Wall
-from furniture import Table
+from furniture import Table, Chair
 from supply import Supply
 from coord import Coord, OutOfBoundsError
 
@@ -25,6 +25,9 @@ class Pub(AStar):
         self.num_supplies = 2
         self.num_staff = 1
         self.num_tables = 3
+        self.num_chairs = 8
+        self.tables = []
+        self.chairs = []
         self.staff = []
         self.supplies = []
         self.customers = []
@@ -35,6 +38,7 @@ class Pub(AStar):
         """ Populate the pub """
         self.add_walls()
         self.add_tables()
+        self.add_chairs()
         self.new_customer()
         for i in range(self.num_supplies):
             pos = self.free_location()
@@ -48,6 +52,34 @@ class Pub(AStar):
             self.staff.append(serv)
 
     ##########################################################################
+    def add_chairs(self):
+        """ Add in a number of chairs """
+        for chrnum in range(self.num_chairs):
+            avail = self.table_adjacent()
+            if avail:
+                pos = random.choice(list(avail))
+            else:
+                pos = self.free_location()
+            chair = Chair(self, f"Chair {chrnum}", pos)
+            self.data[pos] = chair
+            self.chairs.append(chair)
+
+    ##########################################################################
+    def table_adjacent(self):
+        """ Return a free position adjacent to a table """
+        avail = set()
+        for tbl in self.tables:
+            for pos in tbl.positions():
+                for x in (-1, 0, 1):
+                    for y in (-1, 0, 1):
+                        if abs(x) + abs(y) in (0, 2):   # No corner cases
+                            continue
+                        adjacent = Coord(pos.x + x, pos.y + y)
+                        if adjacent not in self.data:
+                            avail.add(adjacent)
+        return avail
+
+    ##########################################################################
     def add_tables(self):
         """ Add in a number of tables """
         for tbl in range(self.num_tables):
@@ -56,8 +88,11 @@ class Pub(AStar):
                 poslist = self.find_space_for_table()
                 if not poslist:
                     continue
+                table = Table(self, f"Table {tbl}", poslist[0])
+                self.tables.append(table)
                 for pos in poslist:
-                    self.data[pos] = Table(self, f"Table {tbl}", pos)
+                    table.add_position(pos)
+                    self.data[pos] = table
                     placed = True
 
     ##########################################################################

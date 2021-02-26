@@ -21,9 +21,9 @@ class Coord:
         return (self.x, self.y).__hash__()
 
     def __str__(self):
-        return f"{self.x}, {self.y}"
+        return f"({self.x}, {self.y})"
 
     def __repr__(self):
-        return f"{self.x}, {self.y}"
+        return f"Coord({self.x}, {self.y})"
 
 # EOF
