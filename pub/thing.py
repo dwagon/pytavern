@@ -8,6 +8,7 @@ class Thing:
         self.pub = pub
         self.name = name
         self.pos = pos
+        self.permeable = False
 
     ##########################################################################
     def __repr__(self):

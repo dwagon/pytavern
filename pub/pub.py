@@ -21,7 +21,7 @@ class Pub(AStar):
         self.size_y = size_y
         self.data = {}
         self.customer_num = 0
-        self.num_customers = 5
+        self.num_customers = 1
         self.num_supplies = 2
         self.num_staff = 1
         self.num_tables = 3
@@ -32,6 +32,9 @@ class Pub(AStar):
         self.supplies = []
         self.customers = []
         self.time = 0
+        self.flags = {
+            'new_customers': False
+        }
 
     ##########################################################################
     def populate(self):
@@ -138,7 +141,7 @@ class Pub(AStar):
         """ Time passing """
         print(f"Time={self.time}")
         odds = 10 - len(self.customers)
-        if random.randrange(1, 100) < odds:
+        if self.flags['new_customers'] and random.randrange(1, 100) < odds:
             self.new_customer()
         for cust in self.customers:
             rc = cust.turn(self.time)
@@ -155,6 +158,14 @@ class Pub(AStar):
         self.time += 1
 
     ##########################################################################
+    def find_empty_chair(self):
+        """ Find a chair that is currently empty """
+        for chair in self.chairs:
+            if not chair.occupant:
+                return chair
+        return None
+
+    ##########################################################################
     def free_location(self):
         """ Find a free location in the pub """
         tries = 0
@@ -169,9 +180,9 @@ class Pub(AStar):
         sys.exit(1)
 
     ##########################################################################
-    def find_route(self, src, dest):
-        """ Find a route between two points """
-        # print(f"find_route({src=},{dest=})")
+    def find_route(self, src, dest, adjacent=False):
+        """ Find a route between two points (or adjacent to dest) """
+        # print(f"find_route({src=},{dest=}, {adjacent=})")
         if hasattr(src, 'pos'):
             srcpos = src.pos
         else:
@@ -180,8 +191,20 @@ class Pub(AStar):
             destpos = dest.pos
         else:
             destpos = dest
+        if adjacent:
+            maxlen = 9999
+            shortdest = None
+            for delta in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                deltapos = Coord(destpos.x + delta[0], destpos.y + delta[1])
+                route = self.astar(srcpos, deltapos)
+                if route is None:
+                    return route
+                routelen = len(list(route))
+                if routelen < maxlen:
+                    maxlen = routelen
+                    shortdest = deltapos
+            destpos = shortdest
         route = self.astar(srcpos, destpos)
-        # print(f"find_route({src=},{dest=}) {route=}")
         return route
 
     ##########################################################################
@@ -198,10 +221,18 @@ class Pub(AStar):
         return 1
 
     ##########################################################################
+    def x_is_goal_reached(self, current, goal):
+        """ Succeed if we have arrived """
+        if current == goal:
+            return True
+        return False
+
+    ##########################################################################
     def is_goal_reached(self, current, goal):
         """ Succeed if we are adjacent to the goal """
         nx = current.x
         ny = current.y
+
         for tmpx, tmpy in [(nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)]:
             try:
                 tmpgoal = Coord(tmpx, tmpy, self.size_x, self.size_y)
@@ -213,7 +244,7 @@ class Pub(AStar):
 
     ##########################################################################
     def neighbors(self, node):
-        """ for a given coordinate in the maze, returns up to 4 adjacent
+        """ for a given coordinate in the world, returns up to 4 adjacent
         (north, east, south, west) nodes that can be reached
         (=any adjacent coordinate that is not a wall)
         """
@@ -225,9 +256,9 @@ class Pub(AStar):
             except OutOfBoundsError:
                 continue
             if pos in self.data:
-                continue
+                if not self.data[pos].permeable:
+                    continue
             ans.append(pos)
-        # print(f"neighbours({node=}) {ans=}")
         return ans
 
     ##########################################################################
@@ -261,14 +292,16 @@ class Pub(AStar):
                     result += '.'
             if y < len(self.customers):
                 cust = self.customers[y]
-                result += f"  {cust.name}@{cust.pos} {cust.demands['amount']}"
+                result += f"  {cust.name}@{cust.pos} mode={cust.mode}"
                 if cust.target:
                     result += f" -> {cust.target}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):
                 stf = self.staff[index]
-                result += f"  {stf.name}@{stf.pos} {stf.supplies}"
+                result += f"  {stf.name}@{stf.pos} mode={stf.mode}"
+                if stf.target:
+                    result += f" -> {stf.target}"
 
             index = y - len(self.customers) - len(self.staff)
             if index >= 0 and index < len(self.supplies):

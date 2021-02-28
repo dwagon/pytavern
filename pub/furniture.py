@@ -25,5 +25,17 @@ class Chair(Thing):
     def __init__(self, pub, name="Chair", pos=None):
         super().__init__(pub, name, pos)
         self.repr = "h"
+        self.occupant = None
+        self.permeable = True
+
+    def sit_down(self, occ):
+        """ Occupy the chair """
+        self.occupant = occ
+        self.permeable = False
+
+    def get_up(self):
+        """ Relinquish the chair """
+        self.occupant = None
+        self.permeable = True
 
 # EOF
