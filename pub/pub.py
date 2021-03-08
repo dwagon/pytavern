@@ -221,13 +221,6 @@ class Pub(AStar):
         return 1
 
     ##########################################################################
-    def x_is_goal_reached(self, current, goal):
-        """ Succeed if we have arrived """
-        if current == goal:
-            return True
-        return False
-
-    ##########################################################################
     def is_goal_reached(self, current, goal):
         """ Succeed if we are adjacent to the goal """
         nx = current.x

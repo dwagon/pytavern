@@ -1,4 +1,5 @@
 """ Staff member definition """
+import random
 import person
 
 
@@ -21,6 +22,11 @@ class Staff(person.Person):
         return None
 
     ##########################################################################
+    def pick_supplies(self):
+        """ Pick which supplies to go to """
+        return random.choice(self.pub.supplies)
+
+    ##########################################################################
     def turn(self, tick):   # pylint: disable=unused-argument
         """ Time passing """
         if self.mode == person.SERV_WAIT:
@@ -37,10 +43,15 @@ class Staff(person.Person):
             if len(route) > 1:
                 self.move(route[1])
             else:
-                # TODO: get order from customer
                 self.mode = person.SERV_GET_SUPPLIES
         elif self.mode == person.SERV_GET_SUPPLIES:
-            pass
+            self.target = self.pick_supplies()
+            route = list(self.pub.find_route(self.pos, self.target, adjacent=True))
+            assert route, f"{self} No route to {self.target}"
+            if len(route) > 1:
+                self.move(route[1])
+            else:
+                self.mode = person.SERV_SERVE_SUPPLIES
         elif self.mode == person.SERV_SERVE_SUPPLIES:
             pass
         return True
