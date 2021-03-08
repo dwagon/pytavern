@@ -29,7 +29,9 @@ class Staff(person.Person):
 
     ##########################################################################
     def route(self, newmode):
-        """ Route to the target - take on newmode if we reach"""
+        """ Route to the target - take on newmode if we reach
+            Return True if moving, False if arrived
+        """
         route = self.pub.find_route(self.pos, self.target, adjacent=True)
         if route is None:
             routelist = []
@@ -37,7 +39,6 @@ class Staff(person.Person):
             routelist = list(route)
         if len(routelist) <= 1:
             self.mode = newmode
-            self.target = None
             return False
         self.move(routelist[1])
         return True
@@ -57,30 +58,31 @@ class Staff(person.Person):
                 self.route(person.SERV_WAIT)
             return True
         elif self.mode == person.SERV_GET_ORDER:
-            self.route(person.SERV_GET_SUPPLIES)
+            if not self.route(person.SERV_GET_SUPPLIES):
+                self.target = None
         elif self.mode == person.SERV_GET_SUPPLIES:
             if self.target is None:
                 self.target = self.pick_supplies()
-            self.route(person.SERV_SERVE_SUPPLIES)
+            if not self.route(person.SERV_SERVE_SUPPLIES):
+                self.get_supplies()
         elif self.mode == person.SERV_SERVE_SUPPLIES:
             self.target = self.cust_serving
-            self.route(person.SERV_WAIT)
+            if not self.route(person.SERV_WAIT):
+                self.deliver_order()
         return True
 
     ##########################################################################
-    def serve(self):
-        """ Transact with suppliers / consumers """
-        if hasattr(self.target, 'take'):
-            take = self.target.take(5)
-            self.supplies += take
-            if take == 0:
-                return False
-            print(f"Took {take} supplies from {self.target.name}")
-        if hasattr(self.target, 'receive'):
-            receive = self.target.receive(self.supplies)
-            self.supplies -= receive
-            print(f"Gave {receive} supplies to {self.target.name}")
-        self.target = None
-        return True
+    def get_supplies(self):
+        """ Get supplies """
+        take = self.target.take(5)
+        self.supplies += take
+        print(f"Took {take} supplies from {self.target.name}")
+
+    ##########################################################################
+    def deliver_order(self):
+        """ Deliver order to customer """
+        receive = self.target.receive(self.supplies)
+        self.supplies -= receive
+        print(f"Gave {receive} supplies to {self.target.name}")
 
 # EOF
