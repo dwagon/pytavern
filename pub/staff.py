@@ -11,6 +11,7 @@ class Staff(person.Person):
         self.supplies = 0
         self.repr = 'B'
         self.target = None
+        self.cust_serving = None
         self.mode = person.SERV_WAIT
 
     ##########################################################################
@@ -27,33 +28,43 @@ class Staff(person.Person):
         return random.choice(self.pub.supplies)
 
     ##########################################################################
+    def route(self, newmode):
+        """ Route to the target - take on newmode if we reach"""
+        route = self.pub.find_route(self.pos, self.target, adjacent=True)
+        if route is None:
+            routelist = []
+        else:
+            routelist = list(route)
+        if len(routelist) <= 1:
+            self.mode = newmode
+            self.target = None
+            return False
+        self.move(routelist[1])
+        return True
+
+    ##########################################################################
     def turn(self, tick):   # pylint: disable=unused-argument
         """ Time passing """
         if self.mode == person.SERV_WAIT:
             cust = self.pick_waiting_customer()
             if cust:
                 self.target = cust
+                self.cust_serving = cust
                 self.mode = person.SERV_GET_ORDER
             else:
-                print(f"{self} waiting to do something")
+                if self.target is None:
+                    self.target = self.pub.free_location()
+                self.route(person.SERV_WAIT)
             return True
         elif self.mode == person.SERV_GET_ORDER:
-            route = list(self.pub.find_route(self.pos, self.target, adjacent=True))
-            assert route, f"{self} No route to {self.target}"
-            if len(route) > 1:
-                self.move(route[1])
-            else:
-                self.mode = person.SERV_GET_SUPPLIES
+            self.route(person.SERV_GET_SUPPLIES)
         elif self.mode == person.SERV_GET_SUPPLIES:
-            self.target = self.pick_supplies()
-            route = list(self.pub.find_route(self.pos, self.target, adjacent=True))
-            assert route, f"{self} No route to {self.target}"
-            if len(route) > 1:
-                self.move(route[1])
-            else:
-                self.mode = person.SERV_SERVE_SUPPLIES
+            if self.target is None:
+                self.target = self.pick_supplies()
+            self.route(person.SERV_SERVE_SUPPLIES)
         elif self.mode == person.SERV_SERVE_SUPPLIES:
-            pass
+            self.target = self.cust_serving
+            self.route(person.SERV_WAIT)
         return True
 
     ##########################################################################
