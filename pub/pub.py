@@ -288,6 +288,8 @@ class Pub(AStar):
                 result += f"  {cust.name}@{cust.pos} mode={cust.mode}"
                 if cust.target:
                     result += f" -> {cust.target}"
+                if cust.demands:
+                    result += f" S: {cust.satisfaction} D: {cust.demands['amount']}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):

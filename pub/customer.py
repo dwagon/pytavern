@@ -19,6 +19,12 @@ class Customer(person.Person):
         self.mode = person.CUST_GO_CHAIR
 
     ##########################################################################
+    def order(self):
+        """ Deliver order to staff """
+        self.mode = person.CUST_WAIT_TO_DRINK
+        return self.demands['amount']
+
+    ##########################################################################
     def turn(self, tick):
         """ Time passing """
         if self.mode == person.CUST_GO_CHAIR:
@@ -33,7 +39,7 @@ class Customer(person.Person):
                 print(f"{self} sat down in {self.chair}")
                 self.target = None
             else:
-                print(f"{self} Steps={len(route)} {route=}")
+                print(f"{self} Steps={len(route)}")
                 self.move(route[1])
         elif self.mode == person.CUST_WAIT_TO_ORDER:
             pass
@@ -46,6 +52,8 @@ class Customer(person.Person):
                 print(f"{self} got up from {self.chair}")
                 print(f"{self} had enough")
                 self.mode = person.CUST_GO_HOME
+            else:
+                self.mode = person.CUST_WAIT_TO_ORDER
         elif self.mode == person.CUST_GO_HOME:
             route = list(self.pub.find_route(self.pos, Coord(1, 1)))
             self.move(route[1])
@@ -60,6 +68,7 @@ class Customer(person.Person):
     ##########################################################################
     def receive(self, hasamt):
         """ Receive supplies from a server """
+        self.mode = person.CUST_DRINK
         grab = min(hasamt, self.demands['amount'])
         self.demands['amount'] -= grab
         return grab

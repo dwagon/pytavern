@@ -12,6 +12,7 @@ class Staff(person.Person):
         self.repr = 'B'
         self.target = None
         self.cust_serving = None
+        self.cust_request = None
         self.mode = person.SERV_WAIT
 
     ##########################################################################
@@ -59,6 +60,7 @@ class Staff(person.Person):
             return True
         elif self.mode == person.SERV_GET_ORDER:
             if not self.route(person.SERV_GET_SUPPLIES):
+                self.get_request(self.cust_serving)
                 self.target = None
         elif self.mode == person.SERV_GET_SUPPLIES:
             if self.target is None:
@@ -72,9 +74,14 @@ class Staff(person.Person):
         return True
 
     ##########################################################################
+    def get_request(self, cust):
+        """ Get the request from the customer """
+        self.cust_request = cust.order()
+
+    ##########################################################################
     def get_supplies(self):
         """ Get supplies """
-        take = self.target.take(5)
+        take = self.target.take(min(5, self.cust_request))
         self.supplies += take
         print(f"Took {take} supplies from {self.target.name}")
 
