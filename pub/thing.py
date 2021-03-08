@@ -12,6 +12,9 @@ class Thing:
 
     ##########################################################################
     def __repr__(self):
-        return f"{self.__class__.__name__} {self.name} @ {self.pos}"
+        if self.__class__.__name__ in self.name:
+            return f"{self.name} @ {self.pos}"
+        else:
+            return f"{self.__class__.__name__} {self.name} @ {self.pos}"
 
 # EOF
