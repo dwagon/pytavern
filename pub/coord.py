@@ -1,4 +1,5 @@
 """ Coordinate system """
+import math
 
 
 class OutOfBoundsError(Exception):
@@ -13,6 +14,11 @@ class Coord:
             raise OutOfBoundsError
         self.x = x
         self.y = y
+
+    def dist(self, a):
+        """ Return distance between self and point a """
+        dist = math.sqrt((self.x - a.x)**2 + (self.y - a.y)**2)
+        return dist
 
     def __eq__(self, a):
         return self.x == a.x and self.y == a.y
