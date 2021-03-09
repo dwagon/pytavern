@@ -29,22 +29,6 @@ class Staff(person.Person):
         return random.choice(self.pub.supplies)
 
     ##########################################################################
-    def route(self, newmode):
-        """ Route to the target - take on newmode if we reach
-            Return True if moving, False if arrived
-        """
-        route = self.pub.find_route(self.pos, self.target, adjacent=True)
-        if route is None:
-            routelist = []
-        else:
-            routelist = list(route)
-        if len(routelist) <= 1:
-            self.mode = newmode
-            return False
-        self.move(routelist[1])
-        return True
-
-    ##########################################################################
     def turn(self, tick):   # pylint: disable=unused-argument
         """ Time passing """
         if self.mode == person.SERV_WAIT:

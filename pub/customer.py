@@ -24,22 +24,34 @@ class Customer(person.Person):
         return self.demands['amount']
 
     ##########################################################################
+    def go_to_chair(self):
+        """ Find a chair to sit down at """
+        self.target_chair = self.pub.find_empty_chair()
+        if self.target_chair is None:
+            self.mode = person.CUST_WAIT_FOR_CHAIR
+            return
+        self.target = self.target_chair.pos
+        rte = self.pub.find_route(self.pos, self.target)
+        if rte is None:
+            route = []
+        else:
+            route = list(rte)
+        if len(route) <= 1:     # Arrived
+            self.chair = self.target_chair
+            self.pos = self.target_chair.pos
+            self.chair.sit_down(self)
+            self.mode = person.CUST_WAIT_TO_ORDER
+            print(f"{self} sat down in {self.chair}")
+            self.target = None
+        else:
+            print(f"{self} Steps={len(route)}")
+            self.move(route[1])
+
+    ##########################################################################
     def turn(self, tick):
         """ Time passing """
         if self.mode == person.CUST_GO_CHAIR:
-            self.target_chair = self.pub.find_empty_chair()
-            self.target = self.target_chair.pos
-            route = list(self.pub.find_route(self.pos, self.target))
-            if len(route) <= 1:     # Arrived
-                self.chair = self.target_chair
-                self.pos = self.target_chair.pos
-                self.chair.sit_down(self)
-                self.mode = person.CUST_WAIT_TO_ORDER
-                print(f"{self} sat down in {self.chair}")
-                self.target = None
-            else:
-                print(f"{self} Steps={len(route)}")
-                self.move(route[1])
+            self.go_to_chair()
         elif self.mode == person.CUST_WAIT_TO_ORDER:
             pass
         elif self.mode == person.CUST_WAIT_TO_DRINK:
@@ -56,8 +68,11 @@ class Customer(person.Person):
         elif self.mode == person.CUST_GO_HOME:
             if self.pos == self.pub.door.pos:
                 return False
-            route = list(self.pub.find_route(self.pos, self.pub.door))
-            self.move(route[1])
+            self.route()
+        elif self.mode == person.CUST_WAIT_FOR_CHAIR:
+            if self.target is None:
+                self.target = self.pub.map.free_people_loc()
+            self.route(person.CUST_GO_CHAIR)
 
         # Thirsty
         if not self.demands.get('amount', 0):
