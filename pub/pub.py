@@ -151,17 +151,20 @@ class Pub():
     def new_customer(self):
         """ Create a new customer """
         pos = self.door.pos
-        cust = Customer(pub=self, name=f"Customer_{self.customer_num}", pos=pos)
-        self.map.add_people(pos, cust)
-        self.customers.append(cust)
-        self.customer_num += 1
+        if self.map.is_person_empty(pos):
+            cust = Customer(pub=self, name=f"Customer_{self.customer_num}", pos=pos)
+            self.map.add_people(pos, cust)
+            self.customers.append(cust)
+            self.customer_num += 1
+        else:
+            print("Door is not empty")
 
     ##########################################################################
     def turn(self):
         """ Time passing """
         print(f"Time={self.time}")
         odds = 10 - len(self.customers)
-        if self.flags['new_customers'] and random.randrange(1, 100) < odds:
+        if self.flags['new_customers'] and random.randrange(1, 200) < odds:
             self.new_customer()
         for cust in self.customers:
             rc = cust.turn(self.time)

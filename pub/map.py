@@ -86,6 +86,12 @@ class Map(AStar):
         return self._is_empty('BUILDING', pos) and self._is_empty('FURNITURE', pos)
 
     ##########################################################################
+    def is_person_empty(self, pos):
+        """ Return if person spot is empty """
+        return self._is_empty('BUILDING', pos) and \
+            self._is_empty('FURNITURE', pos) and self._is_empty('PERSON', pos)
+
+    ##########################################################################
     def _del_item(self, layer, pos):
         """ Delete an item from the map """
         del self.data[layer][pos]
@@ -168,7 +174,7 @@ class Map(AStar):
     ##########################################################################
     def find_route(self, src, dest, adjacent=False):
         """ Find a route between two points (or adjacent to dest) """
-        # print(f"find_route({src=},{dest=}, {adjacent=})")
+        # print(f"find_route({src=},{dest=}, {adjacent=})") # DBG
         if hasattr(src, 'pos'):
             srcpos = src.pos
         else:
@@ -187,12 +193,13 @@ class Map(AStar):
                     continue
                 route = self.astar(srcpos, deltapos)
                 if route is None:
-                    return route
+                    continue
                 routelen = len(list(route))
                 if routelen < maxlen:
                     maxlen = routelen
                     shortdest = deltapos
             destpos = shortdest
+        # print(f"find_route({srcpos=},{destpos=})")    # DBG
         route = self.astar(srcpos, destpos)
         return route
 

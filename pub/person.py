@@ -24,24 +24,21 @@ class Person(Thing):
         self.target = None
         self.mode = UNKNOWN
 
-    def move(self, newloc):
-        """ Move to newloc """
-        self.pub.move(self, newloc)
-        self.pos = newloc
-
-    def route(self, newmode=None):
-        """ Route to the target - take on newmode if we reach
-            Return True if moving, False if arrived
+    def move(self, adjacent=False):
+        """ Route to the target
+            Return True if still moving, False if arrived
         """
-        route = self.pub.find_route(self.pos, self.target, adjacent=True)
+        route = self.pub.find_route(self.pos, self.target, adjacent=adjacent)
         if route is None:
             routelist = []
         else:
             routelist = list(route)
+        # print(f"{self} {self.pos=} {self.target=} {len(routelist)=}")      # DBG
+
         if len(routelist) <= 1:
-            self.mode = newmode
             return False
-        self.move(routelist[1])
+        self.pub.move(self, routelist[1])
+        self.pos = routelist[1]
         return True
 
 # EOF

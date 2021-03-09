@@ -40,20 +40,24 @@ class Staff(person.Person):
             else:
                 if self.target is None:
                     self.target = self.pub.map.free_people_loc()
-                self.route(person.SERV_WAIT)
+                if not self.move():
+                    self.mode = person.SERV_WAIT
             return True
         elif self.mode == person.SERV_GET_ORDER:
-            if not self.route(person.SERV_GET_SUPPLIES):
+            if not self.move():
+                self.mode = person.SERV_GET_SUPPLIES
                 self.get_request(self.cust_serving)
                 self.target = None
         elif self.mode == person.SERV_GET_SUPPLIES:
             if self.target is None:
                 self.target = self.pick_supplies()
-            if not self.route(person.SERV_SERVE_SUPPLIES):
+            if not self.move():
+                self.mode = person.SERV_SERVE_SUPPLIES
                 self.get_supplies()
         elif self.mode == person.SERV_SERVE_SUPPLIES:
             self.target = self.cust_serving
-            if not self.route(person.SERV_WAIT):
+            if not self.move():
+                self.mode = person.SERV_WAIT
                 self.deliver_order()
         return True
 
