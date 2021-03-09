@@ -54,6 +54,8 @@ class Customer(person.Person):
             else:
                 self.mode = person.CUST_WAIT_TO_ORDER
         elif self.mode == person.CUST_GO_HOME:
+            if self.pos == self.pub.door.pos:
+                return False
             route = list(self.pub.find_route(self.pos, self.pub.door))
             self.move(route[1])
 

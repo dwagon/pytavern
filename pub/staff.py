@@ -55,7 +55,7 @@ class Staff(person.Person):
                 self.mode = person.SERV_GET_ORDER
             else:
                 if self.target is None:
-                    self.target = self.pub.free_location()
+                    self.target = self.pub.map.free_people_loc()
                 self.route(person.SERV_WAIT)
             return True
         elif self.mode == person.SERV_GET_ORDER:

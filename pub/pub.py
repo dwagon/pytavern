@@ -81,7 +81,7 @@ class Pub():
                         if abs(x) + abs(y) in (0, 2):   # No corner cases
                             continue
                         adjacent = Coord(pos.x + x, pos.y + y)
-                        if adjacent not in self.data:
+                        if self.map.is_furniture_empty(adjacent):
                             avail.add(adjacent)
         return avail
 
@@ -119,7 +119,7 @@ class Pub():
         poslist = []
         for bit in ((0, 0), (0, 1), (1, 1), (1, 0)):
             newpos = Coord(pos.x + bit[0], pos.y + bit[1])
-            if newpos in self.data:
+            if not self.map.is_furniture_empty(newpos):
                 return None
             poslist.append(newpos)
         return poslist
@@ -133,6 +133,8 @@ class Pub():
                 continue
             self.map.add_building(pos, Wall(self, pos))
             pos = Coord(x, self.size_y-1)
+            if not self.map.is_building_empty(pos):
+                continue
             self.map.add_building(pos, Wall(self, pos))
 
         for y in range(self.size_y):
@@ -141,6 +143,8 @@ class Pub():
                 continue
             self.map.add_building(pos, Wall(self, pos))
             pos = Coord(self.size_x-1, y)
+            if not self.map.is_building_empty(pos):
+                continue
             self.map.add_building(pos, Wall(self, pos))
 
     ##########################################################################
@@ -201,6 +205,11 @@ class Pub():
         """ Move an object to a new location """
         self.map.del_people(obj.pos)
         self.map.add_people(newloc, obj)
+
+    ##########################################################################
+    def find_route(self, src, dest, adjacent=False):
+        """ Find a route between two points (or adjacent to dest) """
+        return self.map.find_route(src, dest, adjacent)
 
     ##########################################################################
     def mainloop(self):

@@ -73,12 +73,17 @@ class Map(AStar):
     ##########################################################################
     def _is_empty(self, layer, pos):
         """ Return if a location in a layer is empty """
-        return pos in self.data[layer]
+        return pos not in self.data[layer]
 
     ##########################################################################
     def is_building_empty(self, pos):
         """ Return if building spot is empty """
         return self._is_empty('BUILDING', pos)
+
+    ##########################################################################
+    def is_furniture_empty(self, pos):
+        """ Return if furniture spot is empty """
+        return self._is_empty('BUILDING', pos) and self._is_empty('FURNITURE', pos)
 
     ##########################################################################
     def _del_item(self, layer, pos):
@@ -104,7 +109,7 @@ class Map(AStar):
     def _add_item(self, layer, pos, obj):
         """ Add an item to the map """
         if pos in self.data[layer]:
-            raise MapCollision
+            raise MapCollision(f"{layer=} {pos=} {obj=} {self.data[layer][pos]=}")
         self.data[layer][pos] = obj
 
     ##########################################################################
@@ -148,8 +153,14 @@ class Map(AStar):
                 pos = Coord(nbx, nby, self.size_x, self.size_y)
             except OutOfBoundsError:
                 continue
-            if pos in self.data:
-                if not self.data[pos].permeable:
+            if pos in self.data['BUILDING']:
+                if not self.data['BUILDING'][pos].permeable:
+                    continue
+            if pos in self.data['FURNITURE']:
+                if not self.data['FURNITURE'][pos].permeable:
+                    continue
+            if pos in self.data['PEOPLE']:
+                if not self.data['PEOPLE'][pos].permeable:
                     continue
             ans.append(pos)
         return ans
@@ -170,7 +181,10 @@ class Map(AStar):
             maxlen = 9999
             shortdest = None
             for delta in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                deltapos = Coord(destpos.x + delta[0], destpos.y + delta[1])
+                try:
+                    deltapos = Coord(destpos.x + delta[0], destpos.y + delta[1])
+                except OutOfBoundsError:
+                    continue
                 route = self.astar(srcpos, deltapos)
                 if route is None:
                     return route
