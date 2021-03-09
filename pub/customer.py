@@ -1,7 +1,6 @@
 """ Customer """
 import random
 
-from coord import Coord
 import person
 
 
@@ -47,7 +46,7 @@ class Customer(person.Person):
             pass
         elif self.mode == person.CUST_DRINK:
             if not self.satisfaction:
-                self.target = Coord(1, 1)
+                self.target = self.pub.door
                 self.chair.get_up()
                 print(f"{self} got up from {self.chair}")
                 print(f"{self} had enough")
@@ -55,7 +54,7 @@ class Customer(person.Person):
             else:
                 self.mode = person.CUST_WAIT_TO_ORDER
         elif self.mode == person.CUST_GO_HOME:
-            route = list(self.pub.find_route(self.pos, Coord(1, 1)))
+            route = list(self.pub.find_route(self.pos, self.pub.door))
             self.move(route[1])
 
         # Thirsty
