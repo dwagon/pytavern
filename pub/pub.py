@@ -10,7 +10,7 @@ from wall import Wall
 from door import Door
 from furniture import Table, Chair
 from supply import Supply
-from coord import Coord, OutOfBoundsError
+from coord import Coord
 
 
 ##############################################################################
@@ -34,7 +34,7 @@ class Pub():
         self.customers = []
         self.time = 0
         self.flags = {
-            'new_customers': False
+            'new_customers': True
         }
 
     ##########################################################################
@@ -184,21 +184,6 @@ class Pub():
             if not chair.occupant:
                 return chair
         return None
-
-    ##########################################################################
-    def is_goal_reached(self, current, goal):
-        """ Succeed if we are adjacent to the goal """
-        nx = current.x
-        ny = current.y
-
-        for tmpx, tmpy in [(nx, ny-1), (nx+1, ny), (nx, ny+1), (nx-1, ny)]:
-            try:
-                tmpgoal = Coord(tmpx, tmpy, self.size_x, self.size_y)
-            except OutOfBoundsError:
-                continue
-            if goal == tmpgoal:
-                return True
-        return False
 
     ##########################################################################
     def move(self, obj, newloc):
