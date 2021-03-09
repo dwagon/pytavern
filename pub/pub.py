@@ -100,8 +100,19 @@ class Pub(AStar):
 
     ##########################################################################
     def find_space_for_table(self):
-        """ Tables are 2x2 - find a free location """
-        pos = self.free_location()
+        """ Tables are 2x2 - find a free location that is not too close to
+            another table or the door
+        """
+        bad = True
+        while bad:
+            pos = self.free_location()
+            if pos.dist(Coord(0, 0)) < 5:
+                continue
+            bad = False
+            for tbl in self.tables:
+                if pos.dist(tbl.pos) < 5:
+                    bad = True
+                    continue
         poslist = []
         for bit in ((0, 0), (0, 1), (1, 1), (1, 0)):
             newpos = Coord(pos.x + bit[0], pos.y + bit[1])
