@@ -129,23 +129,21 @@ class Pub():
         """ Add in the walls around the perimeter """
         for x in range(self.size_x):
             pos = Coord(x, 0)
-            if not self.map.is_building_empty(pos):
-                continue
-            self.map.add_building(pos, Wall(self, pos))
+            if self.map.is_building_empty(pos):
+                self.map.add_building(pos, Wall(self, pos))
+
             pos = Coord(x, self.size_y-1)
-            if not self.map.is_building_empty(pos):
-                continue
-            self.map.add_building(pos, Wall(self, pos))
+            if self.map.is_building_empty(pos):
+                self.map.add_building(pos, Wall(self, pos))
 
         for y in range(self.size_y):
             pos = Coord(0, y)
-            if not self.map.is_building_empty(pos):
-                continue
-            self.map.add_building(pos, Wall(self, pos))
+            if self.map.is_building_empty(pos):
+                self.map.add_building(pos, Wall(self, pos))
+
             pos = Coord(self.size_x-1, y)
-            if not self.map.is_building_empty(pos):
-                continue
-            self.map.add_building(pos, Wall(self, pos))
+            if self.map.is_building_empty(pos):
+                self.map.add_building(pos, Wall(self, pos))
 
     ##########################################################################
     def new_customer(self):
