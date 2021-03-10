@@ -159,7 +159,6 @@ class Map(AStar):
     def neighbors(self, node):
         """ for a given coordinate in the world, returns up to 4 adjacent
         (north, east, south, west) nodes that can be reached
-        (=any adjacent coordinate that is not a wall)
         """
         nx, ny = node.x, node.y
         ans = []

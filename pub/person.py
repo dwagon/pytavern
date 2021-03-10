@@ -35,8 +35,17 @@ class Person(Thing):
             routelist = list(route)
         # print(f"{self} {self.pos=} {self.target=} {len(routelist)=}")      # DBG
 
+        if hasattr(self.target, 'pos'):
+            if self.pos == self.target.pos:
+                return False
+        else:
+            if self.pos == self.target:
+                return False
+
         if len(routelist) <= 1:
-            return False
+            print(f"{self} Failed to route {self.pos=} {self.target=} {routelist=}")    # DBG
+            print(f"{self.pub.map.neighbors(self.pos)}")
+            return True
         self.pub.move(self, routelist[1])
         self.pos = routelist[1]
         return True
