@@ -54,6 +54,7 @@ class Customer(person.Person):
         if self.mode == person.CUST_GO_CHAIR:
             self.go_to_chair()
         elif self.mode == person.CUST_WAIT_TO_ORDER:
+            self.generate_demand(tick)
             pass
         elif self.mode == person.CUST_WAIT_TO_DRINK:
             pass
@@ -72,13 +73,14 @@ class Customer(person.Person):
             self.move()
         elif self.mode == person.CUST_WAIT_FOR_CHAIR:
             self.wait_for_chair()
-
-        # Thirsty
-        if not self.demands.get('amount', 0):
-            self.generate_demand(tick)
-            self.satisfaction -= 1
-
         return True
+
+    ##########################################################################
+    def generate_demand(self, tick):
+        """ So thirsty ... """
+        if not self.demands.get('amount', 0) and self.satisfaction:
+            self.demands = {'time': tick, 'amount': random.randint(1, 3)}
+            self.satisfaction -= 1
 
     ##########################################################################
     def receive(self, hasamt):
@@ -87,10 +89,5 @@ class Customer(person.Person):
         grab = min(hasamt, self.demands['amount'])
         self.demands['amount'] -= grab
         return grab
-
-    ##########################################################################
-    def generate_demand(self, tick):
-        """ Generate new demand for something """
-        self.demands = {'time': tick, 'amount': random.randint(1, 3)}
 
 # EOF
