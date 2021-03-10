@@ -24,6 +24,7 @@ class Map(AStar):
             'FURNITURE': {},
             'PEOPLE': {},
         }
+        self.keys = self.data.keys()
 
     ##########################################################################
     def _random_loc(self):
@@ -73,6 +74,7 @@ class Map(AStar):
     ##########################################################################
     def _is_empty(self, layer, pos):
         """ Return if a location in a layer is empty """
+        assert layer in self.keys
         return pos not in self.data[layer]
 
     ##########################################################################
@@ -99,6 +101,7 @@ class Map(AStar):
     ##########################################################################
     def _del_item(self, layer, pos):
         """ Delete an item from the map """
+        assert layer in self.keys
         del self.data[layer][pos]
 
     ##########################################################################
@@ -119,6 +122,7 @@ class Map(AStar):
     ##########################################################################
     def _add_item(self, layer, pos, obj):
         """ Add an item to the map """
+        assert layer in self.keys
         if pos in self.data[layer]:
             raise MapCollision(f"{layer=} {pos=} {obj=} {self.data[layer][pos]=}")
         self.data[layer][pos] = obj
