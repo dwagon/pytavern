@@ -181,6 +181,34 @@ class Pub():
             if not rc:
                 sys.exit(0)
         self.time += 1
+        self.validate()
+
+    ##########################################################################
+    def validate(self):
+        """ Ensure data integrity """
+        for cust in self.customers:
+            if self.map.data['PEOPLE'].get(cust.pos) != cust:
+                for pos in self.map.data['PEOPLE']:
+                    print(f"{pos=} {self.map.data['PEOPLE'][pos]}")
+                raise AssertionError(f"{cust=} not in place")
+
+        for staff in self.staff:
+            if self.map.data['PEOPLE'].get(staff.pos) != staff:
+                for pos in self.map.data['PEOPLE']:
+                    print(f"{pos=} {self.map.data['PEOPLE'][pos]}")
+                raise AssertionError(f"{staff=} not in place")
+
+        for chair in self.chairs:
+            if self.map.data['FURNITURE'].get(chair.pos) != chair:
+                for pos in self.map.data['FURNITURE']:
+                    print(f"{pos=} {self.map.data['FURNITURE'][pos]}")
+                raise AssertionError(f"{chair=} not in place")
+
+        for table in self.tables:
+            if self.map.data['FURNITURE'].get(table.pos) != table:
+                for pos in self.map.data['FURNITURE']:
+                    print(f"{pos=} {self.map.data['FURNITURE'][pos]}")
+                raise AssertionError(f"{table=} not in place")
 
     ##########################################################################
     def find_empty_chair(self):
