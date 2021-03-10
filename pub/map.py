@@ -87,9 +87,14 @@ class Map(AStar):
 
     ##########################################################################
     def is_person_empty(self, pos):
-        """ Return if person spot is empty """
-        return self._is_empty('BUILDING', pos) and \
-            self._is_empty('FURNITURE', pos) and self._is_empty('PERSON', pos)
+        """ Return if person spot is empty enough to fit a person """
+        if not self._is_empty('BUILDING', pos) and not self.data['BUILDING'][pos].permeable:
+            return False
+        if not self._is_empty('FURNITURE', pos) and not self.data['FURNITURE'][pos].permeable:
+            return False
+        if not self._is_empty('PEOPLE', pos) and not self.data['PEOPLE'][pos].permeable:
+            return False
+        return True
 
     ##########################################################################
     def _del_item(self, layer, pos):
