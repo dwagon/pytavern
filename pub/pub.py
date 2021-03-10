@@ -183,9 +183,9 @@ class Pub():
     ##########################################################################
     def find_empty_chair(self):
         """ Find a chair that is currently empty """
-        for chair in self.chairs:
-            if not chair.occupant:
-                return chair
+        chairs = [_ for _ in self.chairs if not _.occupant]
+        if chairs:
+            return random.choice(chairs)
         return None
 
     ##########################################################################
