@@ -11,6 +11,11 @@ class Supply(Thing):
         self.repr = 'S'
 
     ##########################################################################
+    def is_empty(self):
+        """ Is the supply empty """
+        return self.amount == 0
+
+    ##########################################################################
     def take(self, desired_amount):
         """ Take some of the supply """
         if self.amount >= desired_amount:

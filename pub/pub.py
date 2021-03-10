@@ -174,6 +174,10 @@ class Pub():
                 self.customers.remove(cust)
         for supply in self.supplies:
             supply.turn(self.time)
+        active_supplies = [_ for _ in self.supplies if not _.is_empty()]
+        if not active_supplies:
+            print("No more supplies")
+            sys.exit(0)
         for stff in self.staff:
             rc = stff.turn(self.time)
             if not rc:
