@@ -30,6 +30,10 @@ class Customer(person.Person):
     ##########################################################################
     def go_to_chair(self):
         """ Find a chair to sit down at """
+        if self.blocked > 5:
+            self.mode = person.CUST_WAIT_FOR_CHAIR
+            self.blocked = 0
+            return True
         if not self.move():
             self.mode = person.CUST_WAIT_TO_ORDER
             self.chair = self.target_chair
@@ -54,7 +58,8 @@ class Customer(person.Person):
     def wait_for_chair(self):
         """ Move somewhere and wait for a chair to be free """
         self.target_chair = self.pub.find_empty_chair()
-        if self.target_chair is None:
+        if self.target_chair is None or self.blocked > 5:
+            self.blocked = 0
             if self.target is None:
                 self.target = self.pub.map.free_people_loc()
                 print(f"{self} Moving to {self.target} waiting for chair")
@@ -67,6 +72,9 @@ class Customer(person.Person):
     ##########################################################################
     def wait_to_order(self, tick):
         """ Wait for staff to come and request order """
+        if not self.thirst:
+            self.mode = person.CUST_GO_HOME
+            return True
         stat = f"wait_order_{self.thirst}_tick"
         if stat not in self.stats:
             self.stats[stat] = tick
@@ -92,37 +100,45 @@ class Customer(person.Person):
     ##########################################################################
     def drink(self, tick):
         """ Consume """
-        if not self.thirst:
-            self.target = self.pub.door
-            self.chair.get_up()
-            print(f"{self} got up from {self.chair}")
-            print(f"{self} had enough")
-            self.mode = person.CUST_GO_HOME
-        else:
+        if self.thirst:
             wait_stat = f"wait_order_{self.thirst}_tick"
             drink_stat = f"drink_order_{self.thirst}_tick"
             self.stats[drink_stat] = tick
             time_stat = f"time_to_drink_order_{self.thirst}"
-            self.stats[time_stat] = self.stats[drink_stat] - self.stats[wait_stat]
+            try:
+                self.stats[time_stat] = self.stats[drink_stat] - self.stats[wait_stat]
+            except KeyError:
+                print(f"{self} Failed to have good stats: {self.stats}")
             self.thirst -= 1
             self.mode = person.CUST_WAIT_TO_ORDER
+        else:
+            self.mode = person.CUST_GO_HOME
         return True
 
     ##########################################################################
     def go_home(self, tick):
         """ You don't need to go home but you can't stay here """
+        self.target = self.pub.door
+        if self.chair:
+            print(f"{self} got up from {self.chair}")
+            self.chair.get_up()
+            self.chair = None
         if self.pos == self.pub.door.pos:
             self.stats['left_tick'] = tick
             self.stats['time_at_pub'] = self.stats['left_tick'] - self.stats['enter_tick']
             self.generate_stats()
             self.stats_dump()
             return False
+        if self.blocked > 5:
+            self.target = self.pub.map.free_people_loc()
         self.move()
         return True
 
     ##########################################################################
     def turn(self, tick):
         """ Time passing """
+        if self.blocked > 7:
+            print(f"{1/0}")
         res = True
         if self.mode == person.CUST_GO_CHAIR:
             res = self.go_to_chair()

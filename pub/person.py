@@ -23,6 +23,7 @@ class Person(Thing):
         self.repr = '?'
         self.target = None
         self.mode = UNKNOWN
+        self.blocked = 0
 
     def move(self, adjacent=False):
         """ Route to the target
@@ -45,9 +46,10 @@ class Person(Thing):
             return False
 
         if not routelist:
-            print(f"{self} Failed to route {self.pos=} {self.target=} {adjacent=}")    # DBG
-            print(f"{self.pub.map.neighbors(self.pos)=}")      # DBG
+            # print(f"{self} Failed to route {self.pos=} {self.target=} {adjacent=}")    # DBG
+            self.blocked += 1
             return True
+        self.blocked = 0
         self.pub.move(self, routelist[1])
         self.pos = routelist[1]
         return True

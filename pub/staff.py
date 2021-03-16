@@ -92,6 +92,7 @@ class Staff(person.Person):
             if not self.move(adjacent=True):
                 self.mode = person.SERV_WAIT
                 self.deliver_order()
+                self.target = None
 
     ##########################################################################
     def get_request(self, cust):
