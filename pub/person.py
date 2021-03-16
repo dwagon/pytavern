@@ -41,10 +41,12 @@ class Person(Thing):
         else:
             if self.pos == self.target:
                 return False
+        if len(routelist) == 1 and adjacent:
+            return False
 
-        if len(routelist) <= 1:
-            print(f"{self} Failed to route {self.pos=} {self.target=} {routelist=}")    # DBG
-            print(f"{self.pub.map.neighbors(self.pos)}")
+        if not routelist:
+            print(f"{self} Failed to route {self.pos=} {self.target=} {adjacent=}")    # DBG
+            print(f"{self.pub.map.neighbors(self.pos)=}")      # DBG
             return True
         self.pub.move(self, routelist[1])
         self.pos = routelist[1]

@@ -9,6 +9,7 @@ class Supply(Thing):
         super().__init__(pub, name, pos)
         self.amount = 99
         self.repr = 'S'
+        self.permeable = True
 
     ##########################################################################
     def is_empty(self):

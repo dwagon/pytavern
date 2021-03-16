@@ -182,7 +182,7 @@ class Map(AStar):
     ##########################################################################
     def find_route(self, src, dest, adjacent=False):
         """ Find a route between two points (or adjacent to dest) """
-        # print(f"find_route({src=},{dest=}, {adjacent=})") # DBG
+        # print(f"find_route({src=},{dest=}, {adjacent=})")   # DBG
         if hasattr(src, 'pos'):
             srcpos = src.pos
         else:
@@ -207,7 +207,7 @@ class Map(AStar):
                     maxlen = routelen
                     shortdest = deltapos
             destpos = shortdest
-        # print(f"find_route({srcpos=},{destpos=})")    # DBG
+            # print(f"find_route({srcpos=},{destpos=})")    # DBG
         route = self.astar(srcpos, destpos)
         return route
 

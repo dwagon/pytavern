@@ -18,7 +18,9 @@ class Staff(person.Person):
     ##########################################################################
     def pick_waiting_customer(self):
         """ Pick a customer that is waiting to order """
-        for cust in self.pub.customers:
+        custs = self.pub.customers[:]
+        random.shuffle(custs)
+        for cust in custs:
             if cust.mode == person.CUST_WAIT_TO_ORDER:
                 return cust
         return None
@@ -40,11 +42,11 @@ class Staff(person.Person):
             else:
                 if self.target is None:
                     self.target = self.pub.map.free_people_loc()
-                if not self.move():
+                if not self.move(adjacent=True):
                     self.mode = person.SERV_WAIT
             return True
         elif self.mode == person.SERV_GET_ORDER:
-            if not self.move():
+            if not self.move(adjacent=True):
                 self.mode = person.SERV_GET_SUPPLIES
                 self.get_request(self.cust_serving)
                 self.target = None
@@ -56,7 +58,7 @@ class Staff(person.Person):
                 self.get_supplies()
         elif self.mode == person.SERV_SERVE_SUPPLIES:
             self.target = self.cust_serving
-            if not self.move():
+            if not self.move(adjacent=True):
                 self.mode = person.SERV_WAIT
                 self.deliver_order()
         return True

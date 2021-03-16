@@ -38,7 +38,6 @@ class Customer(person.Person):
     def wait_for_chair(self):
         """ Move somewhere and wait for a chair to be free """
         self.target_chair = self.pub.find_empty_chair()
-        print(f"{self} {self.target_chair=}")
         if self.target_chair is None:
             if self.target is None:
                 self.target = self.pub.map.free_people_loc()
