@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Define the world """
 import random
+import statistics
 import sys
 
 from customer import Customer
@@ -163,7 +164,7 @@ class Pub():
         """ Time passing """
         print(f"Time={self.time}")
         odds = 10 - len(self.customers)
-        if self.flags['new_customers'] and random.randrange(1, 200) < odds:
+        if self.flags['new_customers'] and random.randrange(1, 500) < odds:
             self.new_customer()
         for cust in self.customers:
             rc = cust.turn(self.time)
@@ -180,10 +181,7 @@ class Pub():
             self.stats_dump()
             sys.exit(0)
         for stff in self.staff:
-            rc = stff.turn(self.time)
-            if not rc:
-                self.stats_dump()
-                sys.exit(0)
+            stff.turn(self.time)
         self.time += 1
         self.validate()
 
@@ -247,12 +245,20 @@ class Pub():
     ##########################################################################
     def stats_dump(self):
         """ Dump statistics """
+        waits = []
         print("Old Customers")
         for cust in self.old_customers:
+            waits.extend(cust.stats.get('_waits', []))
             cust.stats_dump()
+
         print("Existing Customers")
         for cust in self.customers:
             cust.stats_dump()
+
+        if waits:
+            print(f"Min: {min(waits)}")
+            print(f"Avg: {statistics.mean(waits)}")
+            print(f"Max: {max(waits)}")
 
     ##########################################################################
     def draw(self):

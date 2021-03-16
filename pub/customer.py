@@ -10,7 +10,7 @@ class Customer(person.Person):
     """ Customer - resource consumer """
     def __init__(self, pub, name, pos):
         super().__init__(pub, name, pos)
-        self.demands = {}
+        self.demands = {'time': 0, 'amount': 0}
         self.thirst = random.randint(1, 9)
         self.target = None
         self.target_chair = None
@@ -18,7 +18,7 @@ class Customer(person.Person):
         self.repr = 'C'
         self.mode = person.CUST_WAIT_FOR_CHAIR
         self.stats = {
-            'enter_tick': self.pub.time,
+            'enter_tick': self.pub.time
             }
 
     ##########################################################################
@@ -45,7 +45,10 @@ class Customer(person.Person):
     ##########################################################################
     def stats_dump(self):
         """ Dump out stats """
-        print(f"{self} {self.stats}")
+        print(f"{self}")
+        for k, v in self.stats.items():
+            if not k.startswith('_'):
+                print(f"    {k} {v}")
 
     ##########################################################################
     def wait_for_chair(self):
@@ -82,7 +85,8 @@ class Customer(person.Person):
             'time_to_find_seat': self.stats['time_to_find_seat'],
             'min_order_time': min(waits),
             'max_order_time': max(waits),
-            'avg_order_time': statistics.mean(waits)
+            'avg_order_time': statistics.mean(waits),
+            '_waits': waits
         }
 
     ##########################################################################
