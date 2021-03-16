@@ -23,7 +23,7 @@ class Pub():
         self.customer_num = 0
         self.num_customers = 1
         self.num_supplies = 2
-        self.num_staff = 1
+        self.num_staff = 2
         self.num_tables = 3
         self.num_chairs = 8
         self.tables = []
@@ -31,6 +31,7 @@ class Pub():
         self.chairs = []
         self.staff = []
         self.supplies = []
+        self.old_customers = []
         self.customers = []
         self.time = 0
         self.flags = {
@@ -168,6 +169,7 @@ class Pub():
             rc = cust.turn(self.time)
             if not rc:
                 print(f"Customer {cust} has left the pub")
+                self.old_customers.append(cust)
                 self.map.del_people(cust.pos)
                 self.customers.remove(cust)
         for supply in self.supplies:
@@ -175,10 +177,12 @@ class Pub():
         active_supplies = [_ for _ in self.supplies if not _.is_empty()]
         if not active_supplies:
             print("No more supplies")
+            self.stats_dump()
             sys.exit(0)
         for stff in self.staff:
             rc = stff.turn(self.time)
             if not rc:
+                self.stats_dump()
                 sys.exit(0)
         self.time += 1
         self.validate()
@@ -233,8 +237,22 @@ class Pub():
     def mainloop(self):
         """ Run forever """
         while True:
-            self.turn()
-            print(self.draw())
+            try:
+                self.turn()
+                print(self.draw())
+            except KeyboardInterrupt:
+                self.stats_dump()
+                return
+
+    ##########################################################################
+    def stats_dump(self):
+        """ Dump statistics """
+        print("Old Customers")
+        for cust in self.old_customers:
+            cust.stats_dump()
+        print("Existing Customers")
+        for cust in self.customers:
+            cust.stats_dump()
 
     ##########################################################################
     def draw(self):
@@ -250,7 +268,7 @@ class Pub():
                 if cust.target:
                     result += f" -> {cust.target}"
                 if cust.demands:
-                    result += f" S: {cust.satisfaction} D: {cust.demands['amount']}"
+                    result += f" T: {cust.thirst} D: {cust.demands['amount']}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):

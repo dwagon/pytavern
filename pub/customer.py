@@ -1,5 +1,6 @@
 """ Customer """
 import random
+import statistics
 
 import person
 
@@ -10,12 +11,15 @@ class Customer(person.Person):
     def __init__(self, pub, name, pos):
         super().__init__(pub, name, pos)
         self.demands = {}
-        self.satisfaction = 9
+        self.thirst = random.randint(1, 9)
         self.target = None
         self.target_chair = None
         self.chair = None
         self.repr = 'C'
         self.mode = person.CUST_WAIT_FOR_CHAIR
+        self.stats = {
+            'enter_tick': self.pub.time,
+            }
 
     ##########################################################################
     def order(self):
@@ -32,7 +36,16 @@ class Customer(person.Person):
             self.pos = self.target_chair.pos
             self.chair.sit_down(self)
             print(f"{self} sat down in {self.chair}")
+            self.stats['find_seat_tick'] = self.pub.time
+            self.stats['time_to_find_seat'] = \
+                self.stats['find_seat_tick'] - self.stats['enter_tick']
             self.target = None
+        return True
+
+    ##########################################################################
+    def stats_dump(self):
+        """ Dump out stats """
+        print(f"{self} {self.stats}")
 
     ##########################################################################
     def wait_for_chair(self):
@@ -46,40 +59,86 @@ class Customer(person.Person):
         else:
             self.target = self.target_chair.pos
             self.mode = person.CUST_GO_CHAIR
+        return True
+
+    ##########################################################################
+    def wait_to_order(self, tick):
+        """ Wait for staff to come and request order """
+        stat = f"wait_order_{self.thirst}_tick"
+        if stat not in self.stats:
+            self.stats[stat] = tick
+        self.generate_demand(tick)
+        return True
+
+    ##########################################################################
+    def generate_stats(self):
+        """ Generate useful stats """
+        drink = 1
+        waits = []
+        while f"time_to_drink_order_{drink}" in self.stats:
+            waits.append(self.stats[f"time_to_drink_order_{drink}"])
+            drink += 1
+        self.stats = {
+            'time_to_find_seat': self.stats['time_to_find_seat'],
+            'min_order_time': min(waits),
+            'max_order_time': max(waits),
+            'avg_order_time': statistics.mean(waits)
+        }
+
+    ##########################################################################
+    def drink(self, tick):
+        """ Consume """
+        if not self.thirst:
+            self.target = self.pub.door
+            self.chair.get_up()
+            print(f"{self} got up from {self.chair}")
+            print(f"{self} had enough")
+            self.mode = person.CUST_GO_HOME
+        else:
+            wait_stat = f"wait_order_{self.thirst}_tick"
+            drink_stat = f"drink_order_{self.thirst}_tick"
+            self.stats[drink_stat] = tick
+            time_stat = f"time_to_drink_order_{self.thirst}"
+            self.stats[time_stat] = self.stats[drink_stat] - self.stats[wait_stat]
+            self.thirst -= 1
+            self.mode = person.CUST_WAIT_TO_ORDER
+        return True
+
+    ##########################################################################
+    def go_home(self, tick):
+        """ You don't need to go home but you can't stay here """
+        if self.pos == self.pub.door.pos:
+            self.stats['left_tick'] = tick
+            self.stats['time_at_pub'] = self.stats['left_tick'] - self.stats['enter_tick']
+            self.generate_stats()
+            self.stats_dump()
+            return False
+        self.move()
+        return True
 
     ##########################################################################
     def turn(self, tick):
         """ Time passing """
+        res = True
         if self.mode == person.CUST_GO_CHAIR:
-            self.go_to_chair()
+            res = self.go_to_chair()
         elif self.mode == person.CUST_WAIT_TO_ORDER:
-            self.generate_demand(tick)
-            pass
+            res = self.wait_to_order(tick)
         elif self.mode == person.CUST_WAIT_TO_DRINK:
             pass
         elif self.mode == person.CUST_DRINK:
-            if not self.satisfaction:
-                self.target = self.pub.door
-                self.chair.get_up()
-                print(f"{self} got up from {self.chair}")
-                print(f"{self} had enough")
-                self.mode = person.CUST_GO_HOME
-            else:
-                self.mode = person.CUST_WAIT_TO_ORDER
+            res = self.drink(tick)
         elif self.mode == person.CUST_GO_HOME:
-            if self.pos == self.pub.door.pos:
-                return False
-            self.move()
+            res = self.go_home(tick)
         elif self.mode == person.CUST_WAIT_FOR_CHAIR:
-            self.wait_for_chair()
-        return True
+            res = self.wait_for_chair()
+        return res
 
     ##########################################################################
     def generate_demand(self, tick):
         """ So thirsty ... """
-        if not self.demands.get('amount', 0) and self.satisfaction:
+        if not self.demands.get('amount', 0) and self.thirst:
             self.demands = {'time': tick, 'amount': random.randint(1, 3)}
-            self.satisfaction -= 1
 
     ##########################################################################
     def receive(self, hasamt):
