@@ -36,7 +36,7 @@ class Pub():
         self.customers = []
         self.time = 0
         self.flags = {
-            'new_customers': False
+            'new_customers': True
         }
 
     ##########################################################################
@@ -270,22 +270,17 @@ class Pub():
                 result += self.map.repr(pos)
             if y < len(self.customers):
                 cust = self.customers[y]
-                result += f"  {cust.name}@{cust.pos} mode={cust.mode}"
-                if cust.target:
-                    result += f" -> {cust.target}"
-                if cust.demands:
-                    result += f" T: {cust.thirst} {cust.demands.get('time_to_drink', 'N/A')}"
+                result += f"  {cust.desc_line()}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):
                 stf = self.staff[index]
-                result += f"  {stf.name}@{stf.pos} mode={stf.mode}"
-                if stf.target:
-                    result += f" -> {stf.target}"
+                result += f"  {stf.desc_line()}"
 
             index = y - len(self.customers) - len(self.staff)
             if index >= 0 and index < len(self.supplies):
-                result += f"  {self.supplies[index].name} {self.supplies[index].amount}"
+                supl = self.supplies[index]
+                result += f"  {supl.desc_line()}"
 
             result += '\n'
         return result
