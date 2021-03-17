@@ -71,7 +71,7 @@ class Customer(person.Person):
     ##########################################################################
     def stats_dump(self):
         """ Dump out stats """
-        print(f"{self}")
+        print(f"  {self}")
         for k, v in self.stats.items():
             if not k.startswith('_'):
                 print(f"    {k} {v}")

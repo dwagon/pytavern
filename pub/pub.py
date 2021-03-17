@@ -249,16 +249,20 @@ class Pub():
     def stats_dump(self):
         """ Dump statistics """
         waits = []
-        print("Old Customers")
-        for cust in self.old_customers:
-            waits.extend(cust.stats.get('_waits', []))
-            cust.stats_dump()
+        if self.old_customers:
+            print("\nOld Customers:")
+            for cust in self.old_customers:
+                waits.extend(cust.stats.get('_waits', []))
+                cust.stats_dump()
 
-        print("Existing Customers")
-        for cust in self.customers:
-            cust.stats_dump()
+        if self.customers:
+            print("\nExisting Customers:")
+            for cust in self.customers:
+                waits.extend(cust.stats.get('_waits', []))
+                cust.stats_dump()
 
         if waits:
+            print("\nStat summary:")
             print(f"Min: {min(waits)}")
             print(f"Avg: {statistics.mean(waits)}")
             print(f"Max: {max(waits)}")
