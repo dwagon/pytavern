@@ -36,7 +36,7 @@ class Pub():
         self.customers = []
         self.time = 0
         self.flags = {
-            'new_customers': True
+            'new_customers': False
         }
 
     ##########################################################################
@@ -274,7 +274,7 @@ class Pub():
                 if cust.target:
                     result += f" -> {cust.target}"
                 if cust.demands:
-                    result += f" T: {cust.thirst}"
+                    result += f" T: {cust.thirst} {cust.demands.get('time_to_drink', 'N/A')}"
 
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):

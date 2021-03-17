@@ -84,11 +84,11 @@ class Customer(person.Person):
     ##########################################################################
     def generate_stats(self):
         """ Generate useful stats """
-        drink = 1
+        drnk = 1
         waits = []
-        while f"time_to_drink_order_{drink}" in self.stats:
-            waits.append(self.stats[f"time_to_drink_order_{drink}"])
-            drink += 1
+        while f"time_to_drink_order_{drnk}" in self.stats:
+            waits.append(self.stats[f"time_to_drink_order_{drnk}"])
+            drnk += 1
         self.stats = {
             'time_to_find_seat': self.stats['time_to_find_seat'],
             }
@@ -101,6 +101,9 @@ class Customer(person.Person):
     ##########################################################################
     def drink(self, tick):
         """ Consume """
+        if self.demands['time_to_drink']:
+            self.demands['time_to_drink'] -= 1
+            return True
         if self.thirst:
             wait_stat = f"wait_order_{self.thirst}_tick"
             drink_stat = f"drink_order_{self.thirst}_tick"
@@ -138,8 +141,7 @@ class Customer(person.Person):
     ##########################################################################
     def turn(self, tick):
         """ Time passing """
-        if self.blocked > 7:
-            print(f"{1/0}")
+        assert self.blocked < 8
         res = True
         if self.mode == person.CUST_GO_CHAIR:
             res = self.go_to_chair()
@@ -160,6 +162,7 @@ class Customer(person.Person):
         """ So thirsty ... """
         if not self.demands.get('amount', 0) and self.thirst:
             self.demands = {'time': tick, 'amount': random.randint(1, 3)}
+            self.demands['time_to_drink'] = self.demands['amount'] * random.randint(1, 20)
 
     ##########################################################################
     def receive(self, hasamt):
