@@ -29,6 +29,7 @@ class Person(Thing):
         """ Route to the target
             Return True if still moving, False if arrived
         """
+        assert self.target is not None
         route = self.pub.find_route(self.pos, self.target, adjacent=adjacent)
         if route is None:
             routelist = []

@@ -57,7 +57,7 @@ class Staff(person.Person):
                 self.get_request(self.cust_serving)
                 self.target = None
         except AttributeError:
-            print("f{self=} {self.target=}")
+            print(f"{self=} {self.target=}")
             raise
 
     ##########################################################################
