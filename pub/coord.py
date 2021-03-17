@@ -21,6 +21,7 @@ class Coord:
         return dist
 
     def __eq__(self, a):
+        assert isinstance(a, Coord)
         return self.x == a.x and self.y == a.y
 
     def __hash__(self):
