@@ -207,7 +207,8 @@ class Map(AStar):
                     maxlen = routelen
                     shortdest = deltapos
             destpos = shortdest
-            # print(f"find_route({srcpos=},{destpos=})")    # DBG
+            if destpos is None:
+                return None
         route = self.astar(srcpos, destpos)
         return route
 
