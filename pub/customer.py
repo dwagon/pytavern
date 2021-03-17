@@ -91,11 +91,12 @@ class Customer(person.Person):
             drink += 1
         self.stats = {
             'time_to_find_seat': self.stats['time_to_find_seat'],
-            'min_order_time': min(waits),
-            'max_order_time': max(waits),
-            'avg_order_time': statistics.mean(waits),
-            '_waits': waits
-        }
+            }
+        if waits:
+            self.stats['min_order_time'] = min(waits)
+            self.stats['max_order_time'] = max(waits)
+            self.stats['avg_order_time'] = statistics.mean(waits)
+            self.stats['_waits'] = waits
 
     ##########################################################################
     def drink(self, tick):
