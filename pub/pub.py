@@ -2,7 +2,6 @@
 """ Define the world """
 import random
 import statistics
-import sys
 
 from customer import Customer
 from map import Map
@@ -36,7 +35,8 @@ class Pub():
         self.customers = []
         self.time = 0
         self.flags = {
-            'new_customers': True
+            'new_customers': True,
+            'terminate': False
         }
 
     ##########################################################################
@@ -173,17 +173,19 @@ class Pub():
                 self.old_customers.append(cust)
                 self.map.del_people(cust.pos)
                 self.customers.remove(cust)
+        if not self.customers:
+            self.flags['terminate'] = True
         for supply in self.supplies:
             supply.turn(self.time)
-        active_supplies = [_ for _ in self.supplies if not _.is_empty()]
-        if not active_supplies:
-            print("No more supplies")
-            self.stats_dump()
-            sys.exit(0)
         for stff in self.staff:
             stff.turn(self.time)
         self.time += 1
         self.validate()
+
+    ##########################################################################
+    def active_supplies(self):
+        """ List of supplies that still have contents """
+        return [_ for _ in self.supplies if not _.is_empty()]
 
     ##########################################################################
     def validate(self):
@@ -234,13 +236,14 @@ class Pub():
     ##########################################################################
     def mainloop(self):
         """ Run forever """
-        while True:
+        while not self.flags['terminate']:
             try:
                 self.turn()
                 print(self.draw())
             except KeyboardInterrupt:
                 self.stats_dump()
                 return
+        self.stats_dump()
 
     ##########################################################################
     def stats_dump(self):

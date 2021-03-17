@@ -92,9 +92,19 @@ class Customer(person.Person):
         return True
 
     ##########################################################################
+    def wait_to_drink(self):
+        """ Wait for staff to deliver order """
+        if not self.pub.active_supplies():
+            self.mode = person.CUST_GO_HOME
+        return True
+
+    ##########################################################################
     def wait_to_order(self, tick):
         """ Wait for staff to come and request order """
         if not self.thirst:
+            self.mode = person.CUST_GO_HOME
+            return True
+        if not self.pub.active_supplies():
             self.mode = person.CUST_GO_HOME
             return True
         stat = f"wait_order_{self.thirst}_tick"
@@ -170,7 +180,7 @@ class Customer(person.Person):
         elif self.mode == person.CUST_WAIT_TO_ORDER:
             res = self.wait_to_order(tick)
         elif self.mode == person.CUST_WAIT_TO_DRINK:
-            pass
+            res = self.wait_to_drink()
         elif self.mode == person.CUST_DRINK:
             res = self.drink(tick)
         elif self.mode == person.CUST_GO_HOME:
