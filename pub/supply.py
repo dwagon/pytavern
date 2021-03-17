@@ -12,6 +12,12 @@ class Supply(Thing):
         self.permeable = True
 
     ##########################################################################
+    def desc_line(self):
+        """ Status line """
+        out = f"{self.name} {self.amount}"
+        return out
+
+    ##########################################################################
     def is_empty(self):
         """ Is the supply empty """
         return self.amount == 0

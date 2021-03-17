@@ -22,6 +22,28 @@ class Customer(person.Person):
             }
 
     ##########################################################################
+    def desc_line(self):
+        """ Return a description of what customer is doing """
+        out = f"{self.name}@{self.pos}"
+        if self.mode == person.CUST_GO_CHAIR:
+            out += f" Going to chair {self.target_chair}"
+        elif self.mode == person.CUST_WAIT_TO_ORDER:
+            out += " Waiting to order"
+        elif self.mode == person.CUST_WAIT_TO_DRINK:
+            out += " Waiting for order"
+        elif self.mode == person.CUST_DRINK:
+            out += f" Drinking for {self.demands['time_to_drink']}"
+        elif self.mode == person.CUST_GO_HOME:
+            out += " Going home"
+        elif self.mode == person.CUST_WAIT_FOR_CHAIR:
+            out += " Waiting for a chair"
+        if self.target:
+            out += f" -> {self.target}"
+        if self.thirst:
+            out += f" Thirst: {self.thirst}"
+        return out
+
+    ##########################################################################
     def order(self):
         """ Deliver order to staff """
         self.mode = person.CUST_WAIT_TO_DRINK

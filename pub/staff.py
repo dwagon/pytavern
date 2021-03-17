@@ -21,6 +21,24 @@ class Staff(person.Person):
         self.mode = person.SERV_WAIT
 
     ##########################################################################
+    def desc_line(self):
+        """ What is the staff doing """
+        out = f"{self.name}@{self.pos}"
+
+        if self.mode == person.SERV_WAIT:
+            out += " Waiting"
+        elif self.mode == person.SERV_GET_ORDER:
+            out += f" Getting order from {self.cust_serving}"
+        elif self.mode == person.SERV_GET_SUPPLIES:
+            out += f" Getting {self.cust_request} supplies"
+        elif self.mode == person.SERV_SERVE_SUPPLIES:
+            out += f" Serving {self.cust_request} supplies to customer {self.cust_serving}"
+
+        if self.target:
+            out += f" -> {self.target}"
+        return out
+
+    ##########################################################################
     def random_pick_waiting_customer(self):
         """ Pick a customer at random that is waiting to order """
         custs = self.pub.customers[:]
