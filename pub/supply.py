@@ -7,7 +7,7 @@ class Supply(Thing):
     """ Definition of supply """
     def __init__(self, pub, name, pos, kind):
         super().__init__(pub, name, pos)
-        self.amount = 99
+        self.amount = 20
         self.kind = kind
         self.repr = 'S'
         self.permeable = True

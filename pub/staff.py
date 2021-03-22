@@ -14,6 +14,7 @@ class Staff(person.Person):
     def __init__(self, pub, name, pos):
         super().__init__(pub, name, pos)
         self.supplies = 0
+        self.kind = None
         self.repr = 'B'
         self.target = None
         self.cust_serving = None
@@ -66,7 +67,7 @@ class Staff(person.Person):
     ##########################################################################
     def pick_supplies(self):
         """ Pick which supplies to go to """
-        return random.choice([_ for _ in self.pub.supplies if _.kind == self.cust_request['kind']])
+        return random.choice([_ for _ in self.pub.supplies if _.kind == self.kind])
 
     ##########################################################################
     def get_order(self):
@@ -118,6 +119,7 @@ class Staff(person.Person):
     def get_request(self, cust):
         """ Get the request from the customer """
         self.cust_request = cust.order()
+        self.kind = self.cust_request['kind']
 
     ##########################################################################
     def get_supplies(self):
@@ -131,6 +133,7 @@ class Staff(person.Person):
         """ Deliver order to customer """
         receive = self.target.receive(self.supplies)
         self.supplies -= receive
-        print(f"Gave {receive} supplies to {self.target.name}")
+        print(f"{self} gave {receive} supplies of {self.kind} to {self.target.name}")
+        self.cust_request = None
 
 # EOF

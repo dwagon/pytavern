@@ -193,8 +193,10 @@ class Pub():
         self.validate()
 
     ##########################################################################
-    def active_supplies(self):
+    def active_supplies(self, kind=None):
         """ List of supplies that still have contents """
+        if kind:
+            return [_ for _ in self.supplies if not _.is_empty() and _.kind == kind]
         return [_ for _ in self.supplies if not _.is_empty()]
 
     ##########################################################################
