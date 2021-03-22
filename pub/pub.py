@@ -22,7 +22,7 @@ class Pub():
         self.map = Map(size_x, size_y)
         self.customer_num = 0
         self.num_customers = 1
-        self.num_supplies = 2
+        self.num_supplies = 3
         self.num_staff = 2
         self.num_tables = 3
         self.num_chairs = 8
@@ -38,6 +38,7 @@ class Pub():
             'new_customers': True,
             'terminate': False
         }
+        self.supply_types = []
 
     ##########################################################################
     def populate(self):
@@ -48,16 +49,25 @@ class Pub():
         self.add_tables()
         self.add_chairs()
         self.new_customer()
-        for i in range(self.num_supplies):
-            pos = self.map.free_furniture_loc()
-            supply = Supply(pub=self, name=f"Supply_{i}", pos=pos)
-            self.map.add_furniture(pos, supply)
-            self.supplies.append(supply)
+        self.add_supplies()
         for i in range(self.num_staff):
             pos = self.map.free_people_loc()
             serv = Staff(pub=self, name=f"Staff_{i}", pos=pos)
             self.map.add_people(pos, serv)
             self.staff.append(serv)
+
+    ##########################################################################
+    def add_supplies(self):
+        """ Add in the supplies """
+        supply_types = ['Beer', 'Red Wine', 'White Wine', 'Cider', 'Water']
+        random.shuffle(supply_types)
+        for i in range(self.num_supplies):
+            pos = self.map.free_furniture_loc()
+            typ = supply_types.pop()
+            self.supply_types.append(typ)
+            supply = Supply(pub=self, name=f"Supply_{i}", pos=pos, kind=typ)
+            self.map.add_furniture(pos, supply)
+            self.supplies.append(supply)
 
     ##########################################################################
     def add_chairs(self):

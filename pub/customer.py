@@ -10,7 +10,7 @@ class Customer(person.Person):
     """ Customer - resource consumer """
     def __init__(self, pub, name, pos):
         super().__init__(pub, name, pos)
-        self.demands = {'time': 0, 'amount': 0}
+        self.demands = {'time': 0, 'amount': 0, 'kind': None}
         self.thirst = random.randint(1, 9)
         self.target = None
         self.target_chair = None
@@ -28,11 +28,11 @@ class Customer(person.Person):
         if self.mode == person.CUST_GO_CHAIR:
             out += f" Going to chair {self.target_chair}"
         elif self.mode == person.CUST_WAIT_TO_ORDER:
-            out += " Waiting to order"
+            out += f" Waiting to order {self.demands['kind']}"
         elif self.mode == person.CUST_WAIT_TO_DRINK:
-            out += " Waiting for order"
+            out += f" Waiting for order of {self.demands['kind']}"
         elif self.mode == person.CUST_DRINK:
-            out += f" Drinking for {self.demands['time_to_drink']}"
+            out += f" Drinking {self.demands['kind']} for {self.demands['time_to_drink']}"
         elif self.mode == person.CUST_GO_HOME:
             out += " Going home"
         elif self.mode == person.CUST_WAIT_FOR_CHAIR:
@@ -47,7 +47,7 @@ class Customer(person.Person):
     def order(self):
         """ Deliver order to staff """
         self.mode = person.CUST_WAIT_TO_DRINK
-        return self.demands['amount']
+        return self.demands
 
     ##########################################################################
     def go_to_chair(self):
@@ -194,6 +194,7 @@ class Customer(person.Person):
         """ So thirsty ... """
         if not self.demands.get('amount', 0) and self.thirst:
             self.demands = {'time': tick, 'amount': random.randint(1, 3)}
+            self.demands['kind'] = random.choice(self.pub.supply_types)
             self.demands['time_to_drink'] = self.demands['amount'] * random.randint(1, 20)
 
     ##########################################################################

@@ -17,22 +17,24 @@ class Staff(person.Person):
         self.repr = 'B'
         self.target = None
         self.cust_serving = None
-        self.cust_request = None
+        self.cust_request = {}
         self.mode = person.SERV_WAIT
 
     ##########################################################################
     def desc_line(self):
         """ What is the staff doing """
         out = f"{self.name}@{self.pos}"
+        amt = self.cust_request.get('amount')
+        knd = self.cust_request.get('kind')
 
         if self.mode == person.SERV_WAIT:
             out += " Waiting"
         elif self.mode == person.SERV_GET_ORDER:
             out += f" Getting order from {self.cust_serving}"
         elif self.mode == person.SERV_GET_SUPPLIES:
-            out += f" Getting {self.cust_request} supplies"
+            out += f" Getting {amt} {knd} supplies"
         elif self.mode == person.SERV_SERVE_SUPPLIES:
-            out += f" Serving {self.cust_request} supplies to customer {self.cust_serving}"
+            out += f" Serving {amt} {knd} supplies to customer {self.cust_serving}"
 
         if self.target:
             out += f" -> {self.target}"
@@ -64,7 +66,7 @@ class Staff(person.Person):
     ##########################################################################
     def pick_supplies(self):
         """ Pick which supplies to go to """
-        return random.choice(self.pub.supplies)
+        return random.choice([_ for _ in self.pub.supplies if _.kind == self.cust_request['kind']])
 
     ##########################################################################
     def get_order(self):
@@ -120,7 +122,7 @@ class Staff(person.Person):
     ##########################################################################
     def get_supplies(self):
         """ Get supplies """
-        take = self.target.take(min(5, self.cust_request))
+        take = self.target.take(min(5, self.cust_request['amount']))
         self.supplies += take
         print(f"Took {take} supplies from {self.target.name}")
 
