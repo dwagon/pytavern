@@ -9,6 +9,7 @@ from customer import Customer
 from map import Map
 from staff import Staff
 from wall import Wall
+from bar_area import Bar
 from door import Door
 from furniture import Table, Chair
 from supply import Supply
@@ -27,7 +28,7 @@ class Pub():
         self.num_supplies = 3
         self.num_staff = 2
         self.num_tables = 3
-        self.num_chairs = 8
+        self.num_chairs = 10
         self.tables = []
         self.door = None
         self.chairs = []
@@ -49,6 +50,7 @@ class Pub():
         self.door = Door(self, Coord(0, 1))
         self.map.add_building(self.door.pos, self.door)
         self.add_walls()
+        self.add_bar()
         self.add_tables()
         self.add_chairs()
         self.new_customer()
@@ -61,11 +63,13 @@ class Pub():
 
     ##########################################################################
     def add_supplies(self):
-        """ Add in the supplies """
-        supply_types = ['Beer', 'Red Wine', 'White Wine', 'Cider', 'Water']
+        """ Add in the supplies - should be behind the bar """
+        supply_types = ['Beer', 'Red Wine', 'White Wine', 'Cider', 'Water', 'Gin', 'Vodka', 'Whisky']
         random.shuffle(supply_types)
+        barloc = [Coord(self.size_x-3, y) for y in range(2, self.size_y-2)]
+        random.shuffle(barloc)
         for i in range(self.num_supplies):
-            pos = self.map.free_furniture_loc()
+            pos = barloc.pop()
             typ = supply_types.pop()
             self.supply_types.append(typ)
             supply = Supply(pub=self, name=f"Supply_{i}", pos=pos, kind=typ)
@@ -138,6 +142,15 @@ class Pub():
                 return None
             poslist.append(newpos)
         return poslist
+
+    ##########################################################################
+    def add_bar(self):
+        """ Add the bar - opposite the door """
+        x = self.size_x - 4
+        for y in range(2, self.size_y-2):
+            pos = Coord(x, y)
+            if self.map.is_building_empty(pos):
+                self.map.add_building(pos, Bar(self, pos))
 
     ##########################################################################
     def add_walls(self):
