@@ -26,16 +26,15 @@ class Staff(person.Person):
         """ What is the staff doing """
         out = f"{self.name}@{self.pos}"
         amt = self.cust_request.get('amount')
-        knd = self.cust_request.get('kind')
 
         if self.mode == person.SERV_WAIT:
             out += " Waiting"
         elif self.mode == person.SERV_GET_ORDER:
             out += f" Getting order from {self.cust_serving}"
         elif self.mode == person.SERV_GET_SUPPLIES:
-            out += f" Getting {amt} {knd} supplies"
+            out += f" Getting {amt} {self.kind} supplies"
         elif self.mode == person.SERV_SERVE_SUPPLIES:
-            out += f" Serving {amt} {knd} supplies to customer {self.cust_serving}"
+            out += f" Serving {amt} {self.kind} to customer {self.cust_serving}"
 
         if self.target:
             out += f" -> {self.target}"
@@ -119,14 +118,16 @@ class Staff(person.Person):
     def get_request(self, cust):
         """ Get the request from the customer """
         self.cust_request = cust.order()
-        self.kind = self.cust_request['kind']
+        if not self.cust_request:
+            self.mode = person.SERV_WAIT
+        self.kind = self.cust_request.get('kind')
 
     ##########################################################################
     def get_supplies(self):
         """ Get supplies """
         take = self.target.take(min(5, self.cust_request['amount']))
         self.supplies += take
-        print(f"Took {take} supplies from {self.target.name}")
+        print(f"{self} took {take} {self.kind} supplies from {self.target.name}")
 
     ##########################################################################
     def deliver_order(self):
@@ -134,6 +135,6 @@ class Staff(person.Person):
         receive = self.target.receive(self.supplies)
         self.supplies -= receive
         print(f"{self} gave {receive} supplies of {self.kind} to {self.target.name}")
-        self.cust_request = None
+        self.cust_request = {}
 
 # EOF

@@ -50,6 +50,7 @@ class Customer(person.Person):
         if not self.pub.active_supplies(self.demands['kind']):
             print(f"{self} Pub is out of {self.demands['kind']}")
             self.mode = person.CUST_GO_HOME
+            return {}
         return self.demands
 
     ##########################################################################
