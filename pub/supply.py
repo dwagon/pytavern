@@ -44,7 +44,7 @@ class Supply(Thing):
         else:
             grab = min(desired_amount, self.amount)
         self.amount -= grab
-        print(f"{self.amount} of supplies left")
+        print(f"{self} {self.amount} of supplies left")
         return grab
 
     ##########################################################################
