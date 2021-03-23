@@ -1,4 +1,5 @@
 """ A supply of something """
+import colorama
 from thing import Thing
 
 
@@ -9,13 +10,25 @@ class Supply(Thing):
         super().__init__(pub, name, pos)
         self.amount = 20
         self.kind = kind
-        self.repr = 'S'
         self.permeable = True
+
+    ##########################################################################
+    def repr(self):
+        """ Mutable representation """
+        if self.amount:
+            col = colorama.Fore.GREEN
+        else:
+            col = colorama.Fore.RED
+        return f'{col}S'
 
     ##########################################################################
     def desc_line(self):
         """ Status line """
-        out = f"{self.name} {self.kind} {self.amount}"
+        if self.amount:
+            col = colorama.Fore.GREEN
+        else:
+            col = colorama.Fore.RED
+        out = f"{col}{self.name} {self.kind} {self.amount} @{self.pos}"
         return out
 
     ##########################################################################

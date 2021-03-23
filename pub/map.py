@@ -217,7 +217,11 @@ class Map(AStar):
         """ Return representation of a location """
         for layer in ('PEOPLE', 'FURNITURE', 'BUILDING'):
             if pos in self.data[layer]:
-                return self.data[layer][pos].repr
+                if callable(self.data[layer][pos].repr):
+                    ans = self.data[layer][pos].repr()
+                else:
+                    ans = self.data[layer][pos].repr
+                return ans
         return '.'
 
 # EOF

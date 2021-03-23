@@ -20,15 +20,21 @@ class Person(Thing):
     """ Definition of a Person - mobile Thing """
     def __init__(self, pub, name, pos):
         super().__init__(pub, name, pos)
-        self.repr = '?'
         self.target = None
         self.mode = UNKNOWN
         self.blocked = 0
 
+    ##########################################################################
+    def repr(self):
+        """ Repr """
+        return '?'
+
+    ##########################################################################
     def desc_line(self):
         """ Return a line describing the person, activities and status """
         raise NotImplementedError
 
+    ##########################################################################
     def move(self, adjacent=False):
         """ Route to the target
             Return True if still moving, False if arrived

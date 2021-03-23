@@ -1,4 +1,5 @@
 """ Definition of Furniture classes """
+import colorama
 from thing import Thing
 
 
@@ -7,7 +8,7 @@ class Table(Thing):
     """ Definition of a Table - immobile Thing """
     def __init__(self, pub, name="Table", pos=None):
         super().__init__(pub, name, pos)
-        self.repr = "T"
+        self.repr = f"{colorama.Fore.MAGENTA}T"
         self.all_positions = set()
 
     def add_position(self, pos):
@@ -24,7 +25,7 @@ class Chair(Thing):
     """ Definition of a Chair - immobile Thing """
     def __init__(self, pub, name="Chair", pos=None):
         super().__init__(pub, name, pos)
-        self.repr = "h"
+        self.repr = f"{colorama.Fore.MAGENTA}h"
         self.occupant = None
         self.permeable = True
 

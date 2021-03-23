@@ -3,6 +3,8 @@
 import random
 import statistics
 
+import colorama
+
 from customer import Customer
 from map import Map
 from staff import Staff
@@ -39,6 +41,7 @@ class Pub():
             'terminate': False
         }
         self.supply_types = []
+        colorama.init()
 
     ##########################################################################
     def populate(self):
@@ -283,10 +286,15 @@ class Pub():
     def draw(self):
         """ Return a string representation of the pub """
         result = ''
+
         for y in range(self.size_y):
             for x in range(self.size_x):
                 pos = Coord(x, y)
+                result += f"{colorama.Fore.BLUE}"
                 result += self.map.repr(pos)
+                result += f"{colorama.Style.RESET_ALL}"
+
+            result += f"{colorama.Fore.GREEN}"
             if y < len(self.customers):
                 cust = self.customers[y]
                 result += f"  {cust.desc_line()}"
@@ -301,6 +309,7 @@ class Pub():
                 supl = self.supplies[index]
                 result += f"  {supl.desc_line()}"
 
+            result += f"{colorama.Style.RESET_ALL}"
             result += '\n'
         return result
 

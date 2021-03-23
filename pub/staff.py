@@ -1,5 +1,6 @@
 """ Staff member definition """
 import random
+import colorama
 import person
 
 # Random
@@ -15,7 +16,7 @@ class Staff(person.Person):
         super().__init__(pub, name, pos)
         self.supplies = 0
         self.kind = None
-        self.repr = 'B'
+        self.repr = f'{colorama.Fore.WHITE}S'
         self.target = None
         self.cust_serving = None
         self.cust_request = {}

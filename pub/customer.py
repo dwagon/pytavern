@@ -2,6 +2,8 @@
 import random
 import statistics
 
+import colorama
+
 import person
 
 
@@ -15,11 +17,23 @@ class Customer(person.Person):
         self.target = None
         self.target_chair = None
         self.chair = None
-        self.repr = 'C'
         self.mode = person.CUST_WAIT_FOR_CHAIR
         self.stats = {
             'enter_tick': self.pub.time
             }
+
+    ##########################################################################
+    def repr(self):
+        """ Mutable representation """
+        if self.mode == person.CUST_GO_HOME:
+            fore = f'{colorama.Fore.RED}'
+        elif self.mode == person.CUST_WAIT_TO_ORDER:
+            fore = f'{colorama.Fore.GREEN}'
+        elif self.mode == person.CUST_WAIT_TO_DRINK:
+            fore = f'{colorama.Fore.YELLOW}'
+        else:
+            fore = f'{colorama.Fore.WHITE}'
+        return f'{fore}C'
 
     ##########################################################################
     def desc_line(self):
