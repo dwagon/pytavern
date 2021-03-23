@@ -98,6 +98,7 @@ class Staff(person.Person):
     ##########################################################################
     def turn(self, tick):   # pylint: disable=unused-argument
         """ Time passing """
+        assert self.blocked < 8
         if self.mode == person.SERV_WAIT:
             self.wait_for_customer()
         elif self.mode == person.SERV_GET_ORDER:
