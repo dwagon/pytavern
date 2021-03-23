@@ -60,6 +60,8 @@ class Customer(person.Person):
     ##########################################################################
     def order(self):
         """ Deliver order to staff """
+        if self.mode != person.CUST_WAIT_TO_ORDER:
+            return {}
         self.mode = person.CUST_WAIT_TO_DRINK
         if not self.pub.active_supplies(self.demands['kind']):
             print(f"{self} Pub is out of {self.demands['kind']}")
