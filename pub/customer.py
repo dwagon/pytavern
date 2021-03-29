@@ -136,19 +136,25 @@ class Customer(person.Person):
     ##########################################################################
     def generate_stats(self):
         """ Generate useful stats """
-        drnk = 1
         waits = []
-        while f"time_to_drink_order_{drnk}" in self.stats:
-            waits.append(self.stats[f"time_to_drink_order_{drnk}"])
-            drnk += 1
+        drinks = 0
+        oldstats = self.stats.copy()    # DBG
+        for k in self.stats:
+            if k.startswith('time_to_drink_order'):
+                waits.append(self.stats[k])
+                drinks += 1
         self.stats = {
             'time_to_find_seat': self.stats['time_to_find_seat'],
+            'time_at_pub': self.stats['time_at_pub']
             }
         if waits:
             self.stats['min_order_time'] = min(waits)
             self.stats['max_order_time'] = max(waits)
             self.stats['avg_order_time'] = statistics.mean(waits)
+            self.stats['drinks'] = drinks
             self.stats['_waits'] = waits
+        else:
+            print(f"Old {self}={oldstats}")
 
     ##########################################################################
     def drink(self, tick):

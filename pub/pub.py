@@ -64,7 +64,9 @@ class Pub():
     ##########################################################################
     def add_supplies(self):
         """ Add in the supplies - should be behind the bar """
-        supply_types = ['Beer', 'Red Wine', 'White Wine', 'Cider', 'Water', 'Gin', 'Vodka', 'Whisky']
+        supply_types = [
+            'Beer', 'Red Wine', 'White Wine', 'Cider', 'Water', 'Gin', 'Vodka', 'Whisky'
+        ]
         random.shuffle(supply_types)
         barloc = [Coord(self.size_x-3, y) for y in range(2, self.size_y-2)]
         random.shuffle(barloc)
@@ -72,7 +74,7 @@ class Pub():
             pos = barloc.pop()
             typ = supply_types.pop()
             self.supply_types.append(typ)
-            supply = Supply(pub=self, name=f"Supply_{i}", pos=pos, kind=typ)
+            supply = Supply(pub=self, name=f"Supply_{i}", pos=pos, kind=typ, amount=10)
             self.map.add_furniture(pos, supply)
             self.supplies.append(supply)
 
@@ -277,23 +279,29 @@ class Pub():
     def stats_dump(self):
         """ Dump statistics """
         waits = []
-        if self.old_customers:
-            print("\nOld Customers:")
+        times = []
+        tpd = []
+        drinks = 0
+        if self.customers + self.old_customers:
             for cust in self.old_customers:
                 waits.extend(cust.stats.get('_waits', []))
                 cust.stats_dump()
-
-        if self.customers:
-            print("\nExisting Customers:")
-            for cust in self.customers:
-                waits.extend(cust.stats.get('_waits', []))
-                cust.stats_dump()
+                times.append(cust.stats['time_at_pub'])
+                if cust.stats.get('drinks'):
+                    drinks += cust.stats['drinks']
+                    tpd.append(cust.stats['time_at_pub'] / cust.stats['drinks'])
 
         if waits:
             print("\nStat summary:")
-            print(f"Min: {min(waits)}")
-            print(f"Avg: {statistics.mean(waits)}")
-            print(f"Max: {max(waits)}")
+            print("Waiting:")
+            print(f"  Min: {min(waits)}")
+            print(f"  Avg: {statistics.mean(waits)}")
+            print(f"  Max: {max(waits)}")
+            print("Time at pub:")
+            print(f"  Min: {min(times)}")
+            print(f"  Avg: {statistics.mean(times)}")
+            print(f"  Avg / Drink: {statistics.mean(tpd)}")
+            print(f"  Max: {max(times)}")
 
     ##########################################################################
     def draw(self):

@@ -6,9 +6,9 @@ from thing import Thing
 ##############################################################################
 class Supply(Thing):
     """ Definition of supply """
-    def __init__(self, pub, name, pos, kind):
+    def __init__(self, pub, name, pos, kind, amount=20):
         super().__init__(pub, name, pos)
-        self.amount = 20
+        self.amount = amount
         self.kind = kind
         self.permeable = True
 
