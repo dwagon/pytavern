@@ -21,6 +21,10 @@ class Staff(person.Person):
         self.cust_serving = None
         self.cust_request = {}
         self.mode = person.SERV_WAIT
+        self.stats = {
+            'served': 0,
+            'steps': 0
+        }
 
     ##########################################################################
     def desc_line(self):
@@ -136,6 +140,7 @@ class Staff(person.Person):
         """ Deliver order to customer """
         receive = self.target.receive(self.supplies)
         self.supplies -= receive
+        self.stats['served'] += 1
         print(f"{self} gave {receive} supplies of {self.kind} to {self.target.name}")
         self.cust_request = {}
 

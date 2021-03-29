@@ -23,6 +23,7 @@ class Person(Thing):
         self.target = None
         self.mode = UNKNOWN
         self.blocked = 0
+        self.stats = {}
 
     ##########################################################################
     def repr(self):
@@ -33,6 +34,14 @@ class Person(Thing):
     def desc_line(self):
         """ Return a line describing the person, activities and status """
         raise NotImplementedError
+
+    ##########################################################################
+    def stats_dump(self):
+        """ Dump out stats """
+        print(f"  {self}")
+        for k, v in self.stats.items():
+            if not k.startswith('_'):
+                print(f"    {k} {v}")
 
     ##########################################################################
     def move(self, adjacent=False):
@@ -62,6 +71,7 @@ class Person(Thing):
             return True
         self.blocked = 0
         self.pub.move(self, routelist[1])
+        self.stats['steps'] = self.stats.get('steps', 0) + 1
         self.pos = routelist[1]
         return True
 

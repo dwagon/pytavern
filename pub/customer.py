@@ -18,9 +18,7 @@ class Customer(person.Person):
         self.target_chair = None
         self.chair = None
         self.mode = person.CUST_WAIT_FOR_CHAIR
-        self.stats = {
-            'enter_tick': self.pub.time
-            }
+        self.stats['enter_tick'] = self.pub.time
 
     ##########################################################################
     def repr(self):
@@ -87,14 +85,6 @@ class Customer(person.Person):
                 self.stats['find_seat_tick'] - self.stats['enter_tick']
             self.target = None
         return True
-
-    ##########################################################################
-    def stats_dump(self):
-        """ Dump out stats """
-        print(f"  {self}")
-        for k, v in self.stats.items():
-            if not k.startswith('_'):
-                print(f"    {k} {v}")
 
     ##########################################################################
     def wait_for_chair(self):

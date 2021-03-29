@@ -282,14 +282,13 @@ class Pub():
         times = []
         tpd = []
         drinks = 0
-        if self.customers + self.old_customers:
-            for cust in self.old_customers:
-                waits.extend(cust.stats.get('_waits', []))
-                cust.stats_dump()
-                times.append(cust.stats['time_at_pub'])
-                if cust.stats.get('drinks'):
-                    drinks += cust.stats['drinks']
-                    tpd.append(cust.stats['time_at_pub'] / cust.stats['drinks'])
+        for cust in self.customers + self.old_customers:
+            waits.extend(cust.stats.get('_waits', []))
+            cust.stats_dump()
+            times.append(cust.stats['time_at_pub'])
+            if cust.stats.get('drinks'):
+                drinks += cust.stats['drinks']
+                tpd.append(cust.stats['time_at_pub'] / cust.stats['drinks'])
 
         if waits:
             print("\nStat summary:")
@@ -297,11 +296,17 @@ class Pub():
             print(f"  Min: {min(waits)}")
             print(f"  Avg: {statistics.mean(waits)}")
             print(f"  Max: {max(waits)}")
-            print("Time at pub:")
-            print(f"  Min: {min(times)}")
-            print(f"  Avg: {statistics.mean(times)}")
-            print(f"  Avg / Drink: {statistics.mean(tpd)}")
-            print(f"  Max: {max(times)}")
+        print("Time at pub:")
+        print(f"  Min: {min(times)}")
+        print(f"  Avg: {statistics.mean(times)}")
+        print(f"  Avg / Drink: {statistics.mean(tpd)}")
+        print(f"  Max: {max(times)}")
+        print("Drinks:")
+        print(f"  Tot: {drinks}")
+
+        print("\nStaff:")
+        for stf in self.staff:
+            stf.stats_dump()
 
     ##########################################################################
     def draw(self):
