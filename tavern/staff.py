@@ -7,7 +7,7 @@ class Staff(Person):
     """ Staff member - satisfies customer requirements """
     def __init__(self, tavern, name, pos):
         super().__init__(tavern, name, pos)
-        self.supplies = 0
+        self.supplies = {}
         self.repr = 'B'
 
     ##########################################################################
@@ -20,10 +20,14 @@ class Staff(Person):
         """ Transact with suppliers / consumers """
         if hasattr(self.target, 'take'):
             take = self.target.take(5)
-            self.supplies += take
+            typ = self.target.supplytype
+            print(f"typ={typ} {self.supplies}")
+            if typ not in self.supplies:
+                self.supplies[typ] = 0
+            self.supplies[typ] += take
             if take == 0:
                 return False
-            print(f"{self.name} took {take} supplies from {self.target.name}")
+            print(f"{self.name} took {take} supplies {typ} from {self.target.name}")
         if hasattr(self.target, 'receive'):
             receive = self.target.receive(self.supplies)
             self.supplies -= receive

@@ -13,13 +13,19 @@ class Customer(Person):
     """ Customer - resource consumer """
     def __init__(self, tavern, name, pos):
         super().__init__(tavern, name, pos)
-        self.demands = {'amount': 0, 'time': 0}
+        self.demands = {}
         self.satisfaction = random.randint(1, 9)
         self.target = None
         self.repr = 'C'
         self.mode = GO_STOOL
         self.target_stool = None
         self.terminate = False
+
+    ##########################################################################
+    def add_demand(self, supplytype, amount):
+        """ Add a demand for a category of supply """
+        now = self.tavern.time
+        self.demands[supplytype] = {'amount': amount, 'time': now}
 
     ##########################################################################
     def turn(self):
@@ -34,10 +40,11 @@ class Customer(Person):
             d += " sitting"
         else:
             d += f" -> {self.target}"
-        if self.demands['amount']:
-            d += f" Demands: {self.demands['amount']}"
+        for typ in self.demands:
+            if self.demands[typ]['amount']:
+                d += f" Demands: {self.demands[typ]['amount']};"
         if self.satisfaction:
-            d += f" Drink to go: {self.satisfaction}"
+            d += f" Drinks to go: {self.satisfaction};"
         d += f" {self.mode}"
         return d
 
@@ -114,6 +121,7 @@ class Customer(Person):
     ##########################################################################
     def generate_demand(self):
         """ Generate new demand for something """
-        self.demands = {'time': self.tavern.time, 'amount': random.randint(1, 3)}
+        supplytype = random.choice(self.tavern.supply_types)
+        self.add_demand(supplytype=supplytype, amount=random.randint(1, 4))
 
 # EOF

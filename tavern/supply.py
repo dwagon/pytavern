@@ -5,10 +5,11 @@ from .thing import Thing
 ##############################################################################
 class Supply(Thing):
     """ Definition of supply """
-    def __init__(self, tavern, name, pos):
+    def __init__(self, tavern, name, pos, supplytype):
         super().__init__(tavern, name, pos)
         self.amount = 99
-        self.repr = 'S'
+        self.repr = '^'
+        self.supplytype = supplytype
         self.category = 'installation'
 
     ##########################################################################

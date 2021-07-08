@@ -22,8 +22,9 @@ class Tavern(AStar):
         self.size_x = kwargs.get('size_x', 20)
         self.size_y = kwargs.get('size_y', 20)
         self.locations = {}
+        self.supply_types = ['beer', 'food', 'water']
         self.customer_num = 0
-        self.num_supplies = kwargs.get('num_supplies', 2)
+        self.num_supplies = kwargs.get('num_supplies', 1)
         self.num_staff = kwargs.get('num_staff', 1)
         self.num_stools = kwargs.get('num_stools', 10)
         self.max_customers = kwargs.get('max_customers', 10)
@@ -42,11 +43,7 @@ class Tavern(AStar):
         """ Populate the tavern """
         self.draw_walls()
         self.new_customer()
-        for i in range(self.num_supplies):
-            pos = self.free_location('installation')
-            supply = Supply(tavern=self, name=f"Supply_{i}", pos=pos)
-            self.locations[pos].add(supply)
-            self.supplies.append(supply)
+        self.generate_supplies()
         for i in range(self.num_staff):
             pos = self.free_location('person')
             serv = Staff(tavern=self, name=f"Staff_{i}", pos=pos)
@@ -57,6 +54,16 @@ class Tavern(AStar):
             stol = Stool(tavern=self, name=f"Stool_{i}", pos=pos)
             self.locations[pos].add(stol)
             self.stools.append(stol)
+
+    ##########################################################################
+    def generate_supplies(self):
+        """ Generate the supply stations for all the types of supplies """
+        for suppl in self.supply_types:
+            for i in range(self.num_supplies):
+                pos = self.free_location('installation')
+                supply = Supply(tavern=self, name=f"Supply_{suppl}_{i}", pos=pos, supplytype=suppl)
+                self.locations[pos].add(supply)
+                self.supplies.append(supply)
 
     ##########################################################################
     def draw_walls(self):
@@ -214,11 +221,11 @@ class Tavern(AStar):
             index = y - len(self.customers)
             if index >= 0 and index < len(self.staff):
                 stf = self.staff[index]
-                result += f"  {stf.name}@{stf.pos} Has {stf.supplies}"
+                result += f" {stf.name}@{stf.pos} Has {stf.supplies}"
 
             index = y - len(self.customers) - len(self.staff)
             if index >= 0 and index < len(self.supplies):
-                result += f"  {self.supplies[index].name} {self.supplies[index].amount}"
+                result += f" {self.supplies[index].name} {self.supplies[index].amount}"
 
             result += '\n'
         return result
